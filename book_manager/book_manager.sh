@@ -1,7 +1,9 @@
 read -p "ISBN > " "isbn"
 
-title=$(curl -s https://api.openbd.jp/v1/get?isbn=$isbn | jq . | grep title | sed 's/^.*"\(.*\)".*$/\1/' | grep -v "Subtitle")
+json_format=$(echo "\&pretty")
 
-author=$(curl -s https://api.openbd.jp/v1/get?isbn=$isbn | jq . | grep author | sed 's/^.*"\(.*\)".*$/\1/' | grep -v "Subtitle" | sed 's/,//g')
+title=$(curl -s https://api.openbd.jp/v1/get?isbn=$isbn$json_format | grep title | sed 's/^.*"\(.*\)".*$/\1/' | grep -v "Subtitle" | sed 's/,//g')
 
-echo "$isbn,$title,$author" | tee /tmp/libary.csv
+author=$(curl -s https://api.openbd.jp/v1/get?isbn=$isbn$json_format | grep author | sed 's/^.*"\(.*\)".*$/\1/' | grep -v "Subtitle" | sed 's/,//g')
+
+echo "$isbn,$title,$author" >> /tmp/libary.csv ; column -t -s, /tmp/libary.csv
