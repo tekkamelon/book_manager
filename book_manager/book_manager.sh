@@ -1,9 +1,19 @@
-read -p "ISBN > " "isbn"
+#!/bin/bash
 
-json_format=$(echo "\&pretty")
+while :
+do
+	if [ "$isbn" = "Q" ]; then
+		echo "終了します" && sed -i '/Q/d' /tmp/library.csv
+		break
+	else
+		read -p "ISBN > " "isbn"
 
-title=$(curl -s https://api.openbd.jp/v1/get?isbn=$isbn$json_format | grep title | sed 's/^.*"\(.*\)".*$/\1/' | grep -v "Subtitle" | sed 's/,//g')
+		json_format=$(echo "\&pretty")
+		
+			title=$(curl -s https://api.openbd.jp/v1/get?isbn=$isbn$json_format | grep title | sed 's/^.*"\(.*\)".*$/\1/' | grep -v "Subtitle" | sed 's/,//g')
+			
+			author=$(curl -s https://api.openbd.jp/v1/get?isbn=$isbn$json_format | grep author | sed 's/^.*"\(.*\)".*$/\1/' | grep -v "Subtitle" | sed 's/,//g')
 
-author=$(curl -s https://api.openbd.jp/v1/get?isbn=$isbn$json_format | grep author | sed 's/^.*"\(.*\)".*$/\1/' | grep -v "Subtitle" | sed 's/,//g')
-
-echo "$isbn,$title,$author" >> /tmp/libary.csv ; column -t -s, /tmp/libary.csv
+		echo "$isbn,$title,$author" >> /tmp/library.csv ; column -t -s, /tmp/library.csv && echo -n -e "\n"
+	fi
+done
