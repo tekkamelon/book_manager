@@ -14,6 +14,10 @@ do
 			
 			author=$(curl -s https://api.openbd.jp/v1/get?isbn=$isbn$json_format | grep author | sed 's/^.*"\(.*\)".*$/\1/' | grep -v "Subtitle" | sed 's/,//g')
 
-		echo "$isbn,$title,$author" >> /tmp/library.csv ; column -t -s, /tmp/library.csv && echo -n -e "\n"
+			publisher=$(curl -s https://api.openbd.jp/v1/get?isbn=$isbn$json_format | grep publisher | sed 's/^.*"\(.*\)".*$/\1/' | grep -v "Subtitle" | sed 's/,//g')
+
+			pubdate=$(curl -s https://api.openbd.jp/v1/get?isbn=$isbn$json_format | grep pubdate | sed 's/^.*"\(.*\)".*$/\1/' | grep -v "Subtitle" | sed 's/,//g')
+
+		echo "$isbn,$title,$author,$publisher,$pubdate" >> /tmp/library.csv ; column -t -s, /tmp/library.csv && echo -n -e "\n"
 	fi
 done
