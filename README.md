@@ -7,7 +7,7 @@
 # githubよりclone
 $ git clone https://github.com/tekkamelon/book_manager
 
-# スクリプトのあるディレクトリへ移 
+# スクリプトのあるディレクトリへ移動
 $ cd book_manager/book_manager/
 
 # 実行権限を付与
@@ -24,4 +24,4 @@ $ ./book_manager.sh
 ISBNを入力するとopenBDからデータを取得,  
 指定したファイル(デフォルトでは"/tmp/library.csv")に  
 ISBN,タイトル,著者名,出版社,発売日が入力される.  
-終了するときは"shift+q"を入力
+"shift+q"を入力で終了
