@@ -32,6 +32,7 @@ do
 			pubdate=$(cat /tmp/data.tmp | grep pubdate | sed 's/^.*"\(.*\)".*$/\1/' | grep -v "Subtitle" | sed 's/,//g') &&
 
 		# csvファイルに取得した内容を追記,1行目および末尾3行目を表示
-		echo "$isbn,$title,$author,$publisher,$pubdate" >> $file ; column -t -s, $file | sed -n '1p' && tail -n -3 $file | column -t -s,
+		echo -n -e "\n" && echo "$isbn,$title,$author,$publisher,$pubdate" >> $file ; column -t -s, $file | sed -n '1p' && tail -n -3 $file | column -t -s, && echo -n -e "\n"
+
 	fi
 done
