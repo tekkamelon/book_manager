@@ -25,19 +25,7 @@ do
 				cat /tmp/data.tmp | grep $1 | sed 's/^.*"\(.*\)".*$/\1/' | grep -v "Subtitle" | sed 's/,//g'
 			}
 
-			# タイトル
-			title=$(catdata title)
-		
-			# 著者名
-			author=$(catdata author)
-
-			# 出版社
-			publisher=$(catdata publisher)
-
-			# 発売日
-			pubdate=$(catdata pubdate)
-
 		# "$file"に取得した内容を追記,1行目および末尾3行目を表示
-		echo -n -e "\n" && echo "$isbn,$title,$author,$publisher,$pubdate" >> $file ; column -t -s, $file | sed -n '1p' && tail -n -3 $file | column -t -s, && echo -n -e "\n"
+		echo -n -e "\n" && echo "$isbn,$(catdata title),$(catdata author),$(catdata publisher),$(catdata pubdate)" >> $file ; column -t -s, $file | sed -n '1p' && tail -n -3 $file | column -t -s, && echo -n -e "\n"
 	fi
 done
