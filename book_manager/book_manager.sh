@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 while :
 do
@@ -16,16 +16,10 @@ do
 
 		# json形式を整形して出力
 		json_format=$(echo "\&pretty")
-			
-			# openBDのapiからデータを取得,"/tmp/data.tmp"に一時保存
-			curl -s https://api.openbd.jp/v1/get?isbn=$isbn$json_format | grep -e title -e author -e publisher -e pubdate > /tmp/data.tmp
 
-			# 関数の定義
-			catdata () {
-				cat /tmp/data.tmp | grep $1 | sed 's/^.*"\(.*\)".*$/\1/' | grep -v "Subtitle" | sed 's/,//g'
-			}
+		echo -n -e "\n" ;
+		# openBDからデータを取得,isbn,タイトル,出版社,発売日,著者を取得し,カンマ区切りにして追記
+		curl -s https://api.openbd.jp/v1/get?isbn=$isbn$json_format | grep -e isbn -e title -e author -e publisher -e pubdate | sed 's/^.*"\(.*\)".*$/\1/' | grep -v "Subtitle" | sed -z -e 's/\n/,/g' -e "s/,\$/\n/" >> $file ; cat $file | column -t -s, | sed -n '1p' && tail -n -3 $file | column -t -s, && echo -n -e "\n" 
 
-		# "$file"に取得した内容を追記,1行目および末尾3行目を表示
-		echo -n -e "\n" && echo "$isbn,$(catdata title),$(catdata author),$(catdata publisher),$(catdata pubdate)" >> $file ; column -t -s, $file | sed -n '1p' && tail -n -3 $file | column -t -s, && echo -n -e "\n"
 	fi
 done
