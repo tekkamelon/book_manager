@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 while :
 do
@@ -18,7 +18,7 @@ do
 		json_format=$(echo "\&pretty")
 			
 			# openBDのapiからデータを取得,"/tmp/data.tmp"に一時保存
-			curl -s https://api.openbd.jp/v1/get?isbn=$isbn$json_format > /tmp/data.tmp
+			curl -s https://api.openbd.jp/v1/get?isbn=$isbn$json_format | grep -e title -e author -e publisher -e pubdate > /tmp/data.tmp
 
 			# 関数の定義
 			catdata () {
