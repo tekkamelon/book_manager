@@ -19,20 +19,25 @@ do
 			
 			# openBDのapiからデータを取得,"/tmp/data.tmp"に一時保存
 			curl -s https://api.openbd.jp/v1/get?isbn=$isbn$json_format > /tmp/data.tmp
+
+			# 関数の定義
+			catdata () {
+				cat /tmp/data.tmp | grep $1 | sed 's/^.*"\(.*\)".*$/\1/' | grep -v "Subtitle" | sed 's/,//g'
+			}
+
 			# タイトル
-			title=$(cat /tmp/data.tmp | grep title | sed 's/^.*"\(.*\)".*$/\1/' | grep -v "Subtitle" | sed 's/,//g') && 
+			title=$(catdata title)
 		
 			# 著者名
-			author=$(cat /tmp/data.tmp | grep author | sed 's/^.*"\(.*\)".*$/\1/' | grep -v "Subtitle" | sed 's/,//g') && 
+			author=$(catdata author)
 
 			# 出版社
-			publisher=$(cat /tmp/data.tmp | grep publisher | sed 's/^.*"\(.*\)".*$/\1/' | grep -v "Subtitle" | sed 's/,//g') &&
+			publisher=$(catdata publisher)
 
 			# 発売日
-			pubdate=$(cat /tmp/data.tmp | grep pubdate | sed 's/^.*"\(.*\)".*$/\1/' | grep -v "Subtitle" | sed 's/,//g') &&
+			pubdate=$(catdata pubdate)
 
-		# csvファイルに取得した内容を追記,1行目および末尾3行目を表示
+		# "$file"に取得した内容を追記,1行目および末尾3行目を表示
 		echo -n -e "\n" && echo "$isbn,$title,$author,$publisher,$pubdate" >> $file ; column -t -s, $file | sed -n '1p' && tail -n -3 $file | column -t -s, && echo -n -e "\n"
-
 	fi
 done
