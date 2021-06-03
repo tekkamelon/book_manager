@@ -12,7 +12,7 @@ do
 	else
 
 		# ISBN
-		read -p "ISBN > " "isbn"
+		read -p "openBD@ISBN > " "isbn"
 
 		# json形式を整形して出力
 		json_format=$(echo "\&pretty")
