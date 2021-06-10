@@ -17,7 +17,7 @@ $ cd book_manager/book_manager/
 $ chmod 755 book_manager.sh
 ```
 
-## hot to use
+## how to use
 
 ```sh
 # スクリプトを起動
