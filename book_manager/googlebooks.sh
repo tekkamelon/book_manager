@@ -10,7 +10,7 @@ do
 	tmpfile=/tmp/gbtmp.json
 
 	if [ "$isbn" = "Q" ]; then
-		echo "入力を終了" 
+		echo "入力を終了" && sed -i '/,,,/d' $file
 		break
 
 	else
@@ -32,7 +32,8 @@ do
 		# 著者名
 		author=$(cat $tmpfile | jq '.items[0] | .volumeInfo | .authors ' | grep -e '\"' | sed 's/"//g' | sed 's/,//g') && 
 
-		echo -n -e "\n" && echo "$title,$author,$publisher,$pubdate" >> $file ; column -t -s, $file | sed -n '1p' && tail -n -3 $file | column -t -s, && echo -n -e "\n"
+		# echo -n -e "\n" && echo "$isbn,$title,$publisher,$pubdate,$author" >> $file ; column -t -s, $file | sed -n '1p' && tail -n -3 $file | column -t -s, && echo -n -e "\n"
+		echo -n -e "\n" && echo "$isbn,$title,$publisher,$pubdate,$author" | tee -a $file | column -t -s, && echo -n -e "\n"
 
 	fi
 done
