@@ -8,7 +8,7 @@
 $ git clone https://github.com/tekkamelon/book_manager
 
 # homeディレクトリに保存用のディレクトリの作成
-mkdir ~/Documents/library
+$ mkdir ~/Documents/library
 
 # スクリプトのあるディレクトリへ移動
 $ cd book_manager/book_manager/
