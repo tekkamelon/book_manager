@@ -3,7 +3,7 @@
 while :
 do
 	# 保存先のディレクトリ,ファイル名
-	file=/tmp/library.csv
+	file=~/Documents/library/library.csv
 
 	if [ "$isbn" = "Q" ]; then
 		echo "入力を終了" 
