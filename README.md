@@ -21,7 +21,7 @@ $ chmod 755 book_manager.sh
 
 ```sh
 # スクリプトを起動
-$ ./book_manager.sh
+$ ./book_manager.sh [保存先のディレクトリ,ファイル名]
 ```
 
 ISBNを入力するとopenBDからデータを取得,  
