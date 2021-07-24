@@ -8,9 +8,6 @@
 # githubよりclone
 $ git clone https://github.com/tekkamelon/book_manager
 
-# homeディレクトリに保存用のディレクトリの作成
-$ mkdir ~/Documents/library
-
 # スクリプトのあるディレクトリへ移動
 $ cd book_manager/book_manager/
 
@@ -21,7 +18,7 @@ $ chmod 755 book_manager.sh
 ## how to use
 
 ```sh
-# スクリプトを起動
+# 保存先を引数としてスクリプトを起動,引数がない場合は"~/Documents/library/library.csv"に保存
 $ ./book_manager.sh [保存先のディレクトリ,ファイル名]
 ```
 
