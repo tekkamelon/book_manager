@@ -4,6 +4,7 @@
 ## install
 
 ```sh
+# linux及びmacOS
 # githubよりclone
 $ git clone https://github.com/tekkamelon/book_manager
 
