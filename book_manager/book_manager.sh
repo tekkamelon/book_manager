@@ -5,6 +5,12 @@ do
 	# 保存先のディレクトリ,ファイル名を引数で指定
 	file=$1
 
+	# 引数の有無を確認
+	if [ "$1" = "" ]
+	then
+		file=~/Documents/library/library.csv
+	fi
+
 	if [ "$isbn" = "Q" ]; then
 		echo "入力を終了" 
 		break
