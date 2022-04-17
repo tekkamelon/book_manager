@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 while :
 do
@@ -8,7 +8,7 @@ do
 	# 引数の有無を確認
 	if [ "$1" = "" ]
 	then
-		file=~/Documents/library/library.csv
+		file=/tmp/library.csv
 	fi
 
 	if [ "$isbn" = "Q" ]; then
@@ -18,10 +18,18 @@ do
 	else
 
 		# ISBN
-		read -p "openBD@ISBN > " "isbn"
+		echo 'openBD@ISBN > ' | tr "\n" " " && read isbn
 
-		# openBDからデータを取得,isbn,タイトル,出版社,発売日,著者を取得し,カンマ区切りにして追記
-		echo -ne "\n" && echo "'https://api.openbd.jp/v1/get?isbn=$isbn&pretty'" | xargs curl -s | grep -e isbn -we title -e publisher -e pubdate -e author | awk -F\" 'BEGIN{ORS = ","} {print $4}' | sed "s/,\$/\n/" | tee -a $file | tr "," " " && echo -ne "\n"
-
+		# openBDからデータを取得,isbn,タイトル,出版社,発売日,著者を抽出し,カンマ区切りにして追記
+		echo "" &&
+		echo "'https://api.openbd.jp/v1/get?isbn=$isbn&pretty'" |
+		xargs wget -q -O - |
+		grep -e isbn -we title -e publisher -e pubdate -e author |
+		awk -F\" 'BEGIN{ORS = ","} {print $4}' |
+		tr "\n" "," |
+		sed "s/,\$/\n/" |
+		tee -a $file |
+		tr "," " " 
+		echo "" 
 	fi
 done
