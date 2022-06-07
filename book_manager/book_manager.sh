@@ -24,9 +24,8 @@ do
 		echo "" &&
 		echo "'https://api.openbd.jp/v1/get?isbn=$isbn&pretty'" |
 		xargs wget -q -O - |
-		grep -e isbn -we title -e publisher -e pubdate -e author |
+		grep -E -w "title|publisher|pubdate|author" |
 		awk -F\" 'BEGIN{ORS = ","} {print $4}' |
-		tr "\n" "," |
 		sed "s/,\$/\n/" |
 		tee -a $file |
 		tr "," " " 
