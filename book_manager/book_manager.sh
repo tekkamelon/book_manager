@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/yash
 
 while :
 do
@@ -8,7 +8,7 @@ do
 	# 引数の有無を確認
 	if [ "$1" = "" ]
 	then
-		file=$HOME/Documents/library/library.csv
+		:
 	fi
 
 	if [ "$isbn" = "Q" ]; then
