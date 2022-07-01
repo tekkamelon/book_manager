@@ -29,7 +29,7 @@ do
 		elif type curl > /dev/null 2>&1; then
 			curl -s "https://api.openbd.jp/v1/get?isbn=$isbn&pretty"
 		fi |
-		grep -E -w "title|publisher|pubdate|author" |
+		grep -E -w "isbn|title|publisher|pubdate|author" |
 		awk -F\" 'BEGIN{ORS = ","} {print $4}' |
 		sed "s/,\$/\n/" |
 		tee -a $file |
