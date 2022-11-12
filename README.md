@@ -18,11 +18,11 @@ $ chmod 755 book_manager.sh
 ## how to use
 
 ```sh
-# 保存先を引数としてスクリプトを起動,引数がない場合は"~/Documents/library/library.csv"に保存
+# 保存先を引数としてスクリプトを起動
 $ ./book_manager.sh [保存先のディレクトリ,ファイル名]
 ```
 
 ISBNを入力するとopenBDからデータを取得,  
-"$file"に指定されたファイル(デフォルトでは"~/Documents/library/library.csv")に  
-ISBN,タイトル,著者名,出版社,発売日が入力される.  
+第1引数に指定されたファイル(引数がない場合は何もせず終了)に  
+"ISBN,タイトル,著者名,出版社,発売日"の形式で保存  
 "shift+q"を入力で終了
