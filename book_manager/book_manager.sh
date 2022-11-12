@@ -6,12 +6,15 @@ do
 	file=$1
 
 	# 引数の有無を確認
-	if [ "$1" = "" ]
-	then
-		:
-	fi
+	if [ "$1" = "" ] ; then
 
-	if [ "$isbn" = "Q" ]; then
+		# 引数がない場合は何もせず終了
+		:
+
+	# 引数が"Q"の場合に真
+	elif [ "$isbn" = "Q" ]; then
+		
+		# メッセージを表示
 		echo "入力を終了" 
 		break
 
@@ -38,7 +41,7 @@ do
 		fi |
 
 		# それぞれのフィールドに完全一致する行を抽出
-		grep -E -w "isbn|title|publisher|pubdate|author" |
+		grep -w -e "isbn" -e "title" -e "publisher" -e "pubdate" -e "author" |
 
 		# awkで区切り文字をダブルクォートに指定,改行をカンマに置換し4フィールド目を出力
 		awk -F\" 'BEGIN{ORS = ","} {print $4}' |
