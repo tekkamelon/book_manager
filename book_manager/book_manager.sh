@@ -1,5 +1,6 @@
 #!/bin/sh
 
+# 環境変数の設定
 export LANG=C
 
 while :
@@ -8,30 +9,30 @@ do
 	# 保存先のディレクトリ,ファイル名を引数で指定
 	file=$1
 
-	# 引数の有無を確認
-	if [ "$1" = "" ] ; then
+	# 引数の有無を確認,あれば真,無ければ偽
+	if [ -z "$1" ] ; then
 
-		# ISBN
+		# 真の場合はプロンプトを表示して入力を読み取る 
 		printf 'openBD@ISBN > ' && read isbn
 
-		# openBDからデータを取得,isbn,タイトル,出版社,発売日,著者を抽出し,カンマ区切りにして追記
+		# 空白行を出力
 		echo "" &&
 		
 		# wgetがシステム内に存在するかを確認
-		if type wget > /dev/null 2>&1; then
+		if type wget > /dev/null 2>&1 ; then
 
 			# wgetでapiを叩く
 			wget -q -O - "https://api.openbd.jp/v1/get?isbn=$isbn&pretty"
 
 		# curlがシステム内に存在するかを確認
-		elif type curl > /dev/null 2>&1; then
+		elif type curl > /dev/null 2>&1 ; then
 			
 			# curlでapiを叩く
 			curl -s "https://api.openbd.jp/v1/get?isbn=$isbn&pretty"
 
-	fi |
+		fi |
 
-		# それぞれのフィールドに完全一致する行を抽出
+		# isbn,タイトル,出版社,発売日,著者を抽出
 		grep -w -e "isbn" -e "title" -e "publisher" -e "pubdate" -e "author" |
 
 		# awkで区切り文字をダブルクォートに指定,改行をカンマに置換し4フィールド目を出力
@@ -45,39 +46,40 @@ do
 
 		# 空白行を出力
 		echo "" 
-
+		
+		# 終了する
 		exit 0
 
-	# 引数が"Q"の場合に真
+	# 偽の場合は引数が"Q"の場合に真,それ以外で偽
 	elif [ "$isbn" = "Q" ]; then
 		
 		# メッセージを表示
-		echo "入力を終了" 1>&2
+		echo "finish input" 1>&2
 		break
 
 	else
 
-		# ISBN
+		# 偽の場合はプロンプトを表示して入力を読み取る 
 		printf 'openBD@ISBN > ' && read isbn
 
-		# openBDからデータを取得,isbn,タイトル,出版社,発売日,著者を抽出し,カンマ区切りにして追記
+		# 空白行を出力
 		echo "" &&
 		
 		# wgetがシステム内に存在するかを確認
-		if type wget > /dev/null 2>&1; then
+		if type wget > /dev/null 2>&1 ; then
 
 			# wgetでapiを叩く
 			wget -q -O - "https://api.openbd.jp/v1/get?isbn=$isbn&pretty"
 
 		# curlがシステム内に存在するかを確認
-		elif type curl > /dev/null 2>&1; then
+		elif type curl > /dev/null 2>&1 ; then
 			
 			# curlでapiを叩く
 			curl -s "https://api.openbd.jp/v1/get?isbn=$isbn&pretty"
 
-	fi |
+		fi |
 
-		# それぞれのフィールドに完全一致する行を抽出
+		# isbn,タイトル,出版社,発売日,著者を抽出
 		grep -w -e "isbn" -e "title" -e "publisher" -e "pubdate" -e "author" |
 
 		# awkで区切り文字をダブルクォートに指定,改行をカンマに置換し4フィールド目を出力
