@@ -6,21 +6,18 @@ export LANG=C
 while :
 do
 
+	# ====== 変数の処理 ======
 	# 保存先のディレクトリ,ファイル名を引数で指定
-	file=$1
+	file="${1}"
 
-	# 引数の有無を確認,あれば真,無ければ偽
-	if [ -z "${file}" ] ; then
+	# パイプを素通りする"cat"を代入
+	cat_tee="cat - "
 
-
-		# 真の場合はパイプを素通りない
-		catee="cat - "
-
-		# 一度読み込み終了
-		command_exit="exit 0"
+	# 読み込み終了の"exit"を代入
+	command_exit="exit 0"
 
 	# 偽の場合は引数が"Q"の場合に真,それ以外で偽
-	elif [ "$isbn" = "Q" ]; then
+	if [ "${isbn}" = "Q" ] ; then
 		
 		# メッセージを標準エラー出力に表示
 		echo "finish input" 1>&2
@@ -28,15 +25,22 @@ do
 		# whileのループから脱出
 		break
 
-	else
+	# 引数の有無を確認,あれば真,無ければ偽
+	elif [ -n "${file}" ] ; then
 
-		# 引数に指定されたファイルに書き込み
-		catee="tee -a $file"
+		# 真の場合は"tee"を代入
+		cat_tee="tee -a ${file}"
 
 		# 何もしない
 		command_exit=":"
 
+	else
+
+		# 偽の場合は何もしない
+		:
+
 	fi
+	# ====== 変数の処理の終了 ======
 
 	# プロンプトを表示して入力を読み取る 
 	printf 'openBD@ISBN > ' && read isbn
@@ -48,13 +52,13 @@ do
 	if type wget > /dev/null 2>&1 ; then
 
 		# wgetでapiを叩く
-		wget -q -O - "https://api.openbd.jp/v1/get?isbn=$isbn&pretty"
+		wget -q -O - "https://api.openbd.jp/v1/get?isbn=${isbn}&pretty"
 
 	# curlがシステム内に存在するかを確認
 	elif type curl > /dev/null 2>&1 ; then
 		
 		# curlでapiを叩く
-		curl -s "https://api.openbd.jp/v1/get?isbn=$isbn&pretty"
+		curl -s "https://api.openbd.jp/v1/get?isbn=${isbn}&pretty"
 
 	fi |
 
@@ -68,7 +72,7 @@ do
 	sed "s/,\$/\n/" |
 
 	# 引数がない場合は"cat",ある場合は"tee"
-	${catee} |
+	${cat_tee} |
 
 	# 整形して出力
 	tr "," " " 
