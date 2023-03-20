@@ -42,9 +42,6 @@ else
 		# 保存先のディレクトリ,ファイル名を引数で指定
 		file="${1}"
 	
-		# パイプを素通りする"cat"を代入
-		cat_tee="cat - "
-	
 		# 読み込み終了の"exit"を代入
 		command_exit="exit 0"
 	
@@ -59,9 +56,6 @@ else
 	
 		# 偽の場合は引数の有無を確認,あれば真,無ければ偽
 		elif [ -n "${file}" ] ; then
-	
-			# 真の場合は"tee"を代入
-			cat_tee="tee -a ${file}"
 	
 			# 何もしない
 			command_exit=":"
@@ -97,14 +91,17 @@ else
 		# isbn,タイトル,出版社,発売日,著者を抽出
 		grep -w -e "isbn" -e "title" -e "publisher" -e "pubdate" -e "author" |
 	
-		# 区切り文字にダブルクォートを指定,4フィールド目を出力
-		cut -d\" -f4 |
-	
+		# 区切り文字にダブルクォートを指定,4フィールド目を出力	
+		cut -d\" -f4 | 
+
 		# 各行をカンマ区切りで1行に結合
-		paste -s -d"," |
-	
-		# 引数がない場合は"cat",ある場合は"tee"で書き込み
-		${cat_tee} |
+		paste -d"," -s | 
+
+		# 空白行を削除
+		sed '/^$/d'|
+
+		# 指定ファイルに追記,指定されてない場合は素通り
+		tee -a ${file} |
 	
 		# 整形して出力
 		tr "," " " 
