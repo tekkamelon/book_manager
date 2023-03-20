@@ -3,11 +3,8 @@
 # 環境変数の設定
 export LANG=C
 
-# 標準入力の有無を確認,あれば真,無ければ偽
-if [ -p /dev/stdin ] ; then
-
-	# 真の場合は標準入力を変数の代入
-	isbn=$(cat - )
+# apiを叩き,結果を加工
+hit_api(){
 
 	# wgetがシステム内に存在するかを確認
 	if type wget > /dev/null 2>&1 ; then
@@ -31,6 +28,17 @@ if [ -p /dev/stdin ] ; then
 
 	# 各行をカンマ区切りで1行に結合
 	paste -s -d","
+
+}
+
+# 標準入力の有無を確認,あれば真,無ければ偽
+if [ -p /dev/stdin ] ; then
+
+	# 真の場合は標準入力を変数の代入
+	isbn=$(cat - )
+
+	# apiを叩く
+	hit_api
 
 else
 
@@ -72,32 +80,12 @@ else
 		printf 'openBD@ISBN > ' && read isbn
 	
 		# 空白行を出力
-		echo "" &&
-		
-		# wgetがシステム内に存在するかを確認
-		if type wget > /dev/null 2>&1 ; then
+		echo ""
 	
-			# wgetでapiを叩く
-			wget -q -O - "https://api.openbd.jp/v1/get?isbn=${isbn}&pretty"
-	
-		# curlがシステム内に存在するかを確認
-		elif type curl > /dev/null 2>&1 ; then
-			
-			# curlでapiを叩く
-			curl -s "https://api.openbd.jp/v1/get?isbn=${isbn}&pretty"
-	
-		fi |
-	
-		# isbn,タイトル,出版社,発売日,著者を抽出
-		grep -w -e "isbn" -e "title" -e "publisher" -e "pubdate" -e "author" |
-	
-		# 区切り文字にダブルクォートを指定,4フィールド目を出力	
-		cut -d\" -f4 | 
+		# apiを叩く
+		hit_api |
 
-		# 各行をカンマ区切りで1行に結合
-		paste -d"," -s | 
-
-		# 空白行を削除
+		# 空白行の削除
 		sed '/^$/d'|
 
 		# 指定ファイルに追記,指定されてない場合は素通り
