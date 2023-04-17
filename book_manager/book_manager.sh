@@ -18,6 +18,11 @@ hit_api(){
 		# curlでapiを叩く
 		curl -s "https://api.openbd.jp/v1/get?isbn=${isbn}&pretty"
 
+	else
+
+		# wgetもcurlもない場合はメッセージを表示
+		echo 'please install "wget" or "curl"' 1>&2
+
 	fi |
 
 	# isbn,タイトル,出版社,発売日,著者を抽出
@@ -37,11 +42,11 @@ hit_api(){
 # 標準入力の有無を確認,あれば真,無ければ偽
 if [ -p /dev/stdin ] ; then
 
-	# 真の場合は標準入力を変数の代入,非対話的に処理
+	# 真の場合は標準入力を変数に代入,非対話的に処理
 	isbn=$(cat - )
 
 	# apiを叩く
-	hit_api
+	"hit_api"
 
 else
 
@@ -81,7 +86,7 @@ else
 		echo ""
 	
 		# apiを叩く
-		hit_api |
+		"hit_api" |
 
 		# 指定ファイルに追記,指定されてない場合は素通り
 		tee -a ${file}
