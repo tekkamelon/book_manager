@@ -70,17 +70,22 @@ else
 			# whileのループから脱出
 			break
 	
-		# 偽の場合は引数の有無を確認,あれば真,無ければ何もしない
+		# 偽の場合は引数の有無を確認,あれば真,無ければ偽
 		elif [ -n "${file}" ] ; then
 	
-			# 何もしないコマンドを代入
+			# 真の場合は何もしないコマンドを代入
 			command_exit=":"
 	
+		else
+
+			# 偽の場合は"file"に"/dev/null"を代入
+			file="/dev/null"
+
 		fi
 		# ====== 変数の処理の終了 ======
 	
 		# プロンプトを表示して入力を読み取る 
-		printf 'openBD@ISBN > ' && read isbn
+		printf 'openBD@ISBN > ' && read -r isbn
 	
 		# 空白行を出力
 		echo ""
@@ -88,8 +93,8 @@ else
 		# apiを叩く
 		"hit_api" |
 
-		# 指定ファイルに追記,指定されてない場合は素通り
-		tee -a ${file}
+		# 指定ファイルに追記,指定されてない場合は/dev/nullへ
+		tee -a "${file}"
 	
 		# 空白行を出力
 		echo "" 
