@@ -1,6 +1,7 @@
 #!/bin/sh
 
 # 環境変数の設定
+export LC_ALL=C
 export LANG=C
 
 # apiを叩き,結果を加工
@@ -54,6 +55,7 @@ else
 	while :
 	do
 	
+
 		# ====== 変数の処理 ======
 		# 保存先のディレクトリ,ファイル名を引数で指定
 		file="${1}"
@@ -83,6 +85,7 @@ else
 
 		fi
 		# ====== 変数の処理の終了 ======
+
 	
 		# プロンプトを表示して入力を読み取る 
 		printf 'openBD@ISBN > ' && read -r isbn
