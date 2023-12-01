@@ -1,8 +1,14 @@
 #!/bin/sh
 
+# ====== 環境変数の設定 ======
 # 環境変数の設定
 export LC_ALL=C
 export LANG=C
+
+# GNU coreutilsの挙動をPOSIXに準拠
+export POSIXLY_CORRECT=1
+# ====== 環境変数の設定ここまで ======
+
 
 # apiを叩き,結果を加工
 hit_api(){
@@ -29,18 +35,8 @@ hit_api(){
 	# isbn,タイトル,出版社,発売日,著者を抽出
 	grep -F -w -e "isbn" -e "title" -e "publisher" -e "pubdate" -e "author" |
 
-	# 組み込み変数の設定
-	awk 'BEGIN{
-
-		# 区切り文字にダブルクォートに指定
-		FS = "\""
-
-		# レコード区切り文字を改行からカンマに指定
-		ORS = ","
-
-	}
-	
-	{
+	# 区切り文字をダブルクォートに指定
+	awk -F "\"" '{
 
 		# 行頭が"      "author""にマッチする場合は真,それ以外で偽
 		if(/^      "author"/) {
@@ -67,8 +63,8 @@ hit_api(){
 
 	}' |
 
-	# 末尾のカンマの削除
-	sed "s/,$/\n/g"
+	# 区切り文字をカンマに指定,列を行に置換
+	paste -s -d ',' -
 
 }
 
