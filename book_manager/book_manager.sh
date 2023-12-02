@@ -118,16 +118,17 @@ else
 		# プロンプトを表示して入力を読み取る 
 		printf 'openBD@ISBN > ' && read -r isbn
 	
-		# 空白行を出力
 		echo ""
 	
 		# apiを叩く
 		"hit_api" |
 
+		# 空白行を削除
+		sed '/^$/d' |
+
 		# 指定ファイルに追記,指定されてない場合は/dev/nullへ
 		tee -a "${file}"
 	
-		# 空白行を出力
 		echo "" 
 	
 		# 引数がない場合は終了,ある場合は何もしない
