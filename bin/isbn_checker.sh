@@ -46,19 +46,19 @@ cat << EOS > math.fifo &
 *3+
 EOS
 
-# isbnの計算
+# isbnの左から奇数桁+偶数桁*3の剰余を求める
 surplus=$(
 
-	# isbn.fifoとmath.fifoを結合
+	# 区切り文字を無しに指定,isbn.fifoとmath.fifoを結合
 	paste -d "" isbn.fifo math.fifo |
 
-	# 改行を削除,行末に改行コードを追加しbcで計算
-	tr -d "\n" | xargs -I{} printf "{}\n" | tbug |bc
+	# 改行を削除,式を"()"でくくり行末に剰余を求める式を追加,bcで計算
+	tr -d "\n" | xargs -I{} echo "({})%10" | bc
 
 )
 
-# "surplus"の剰余が0であれば真,それ以外で偽
-if [ $((surplus % 10)) = 0 ] ; then
+# "surplus"が0であれば真,それ以外で偽
+if [ "${surplus}" = 0 ] ; then
 
 	# 真の場合はisbnを出力
 	echo "${isbn}"
