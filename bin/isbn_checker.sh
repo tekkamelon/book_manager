@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -eu
 
 # ====== 環境変数の設定 ======
 # 環境変数の設定
@@ -16,9 +16,6 @@ if [ -p /dev/stdin ] ; then
 	# 真の場合は標準入力を変数に代入
 	isbn=$(cat - )
 
-	# 名前付きパイプを作成
-	mkfifo isbn.fifo math.fifo
-
 else
 
 	# 偽の場合は終了
@@ -26,34 +23,16 @@ else
 
 fi
 
-set -eu
-# "isbn"をタテにして名前付きパイプへリダイレクト
-echo "${isbn}" | fold -w1 > isbn.fifo &
-
-# isbnが正しいかをチェックする式を出力,名前付きパイプへリダイレクト
-cat << EOS > math.fifo &
-+
-*3+
-+
-*3+
-+
-*3+
-+
-*3+
-+
-*3+
-+
-*3+
-EOS
-
-# isbnの左から奇数桁+偶数桁*3の剰余を求める
 surplus=$(
 
-	# 区切り文字を無しに指定,isbn.fifoとmath.fifoを結合
-	paste -d "" isbn.fifo math.fifo |
+	echo "${isbn}" |
 
-	# 改行を削除,式を"()"でくくり行末に剰余を求める式を追加,bcで計算
-	tr -d "\n" | xargs -I{} echo "({})%10" | bc
+	# 1文字ずつフィールドに分割,isbnの左から奇数桁+偶数桁*3の剰余を求める
+	awk -v FS='' '{
+
+		print ($1 + $2 *3 + $3 + $4 * 3 + $5 + $6 * 3 + $7 + $8 * 3 + $9 + $10 * 3 + $11 + $12 * 3 + $13) % 10
+
+	}'
 
 )
 
@@ -69,7 +48,4 @@ else
 	echo "ISBN is bad!" 1>&2
 
 fi
-
-# 名前付きパイプを削除
-rm isbn.fifo math.fifo
 
