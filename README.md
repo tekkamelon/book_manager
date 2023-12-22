@@ -28,10 +28,10 @@ ISBNを入力するとopenBDからデータを取得,
 "ISBN,タイトル,著者名,出版社,発売日"の形式で保存  
 "shift+q"を入力で終了
 
-### isbn_checker.sh
+### isbn_checker.awk
 ```sh
 # パイプでISBNコードを渡す
-$ echo "9782379890062" | ./isbn_checker.sh
+$ echo "9782379890062" | ./isbn_checker.awk
 ```
 
 パイプで渡されたISBNを検算,正しければそのまま出力,間違っていればエラーメッセージを出力
