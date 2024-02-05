@@ -1,16 +1,19 @@
-#!/bin/sh
+#!/bin/sh -eu
 
-# ====== 環境変数の設定 ======
+# ====== 変数の設定 ======
 # 環境変数の設定
 export LC_ALL=C
 export LANG=C
 
 # GNU coreutilsの挙動をPOSIXに準拠
 export POSIXLY_CORRECT=1
-# ====== 環境変数の設定ここまで ======
+
+# デフォルトの変数
+isbn="not_input"
+file="/dev/null"
+# ====== 変数の設定ここまで ======
 
 
-set -eu
 # apiを叩き,結果を加工
 hit_api(){
 
@@ -69,7 +72,6 @@ hit_api(){
 	sed '/^$/d'
 
 }
-set +eu
 
 # 標準入力の有無を確認,あれば真,無ければ偽
 if [ -p /dev/stdin ] ; then
@@ -80,14 +82,13 @@ if [ -p /dev/stdin ] ; then
 	# apiを叩く
 	"hit_api"
 
-else
+# 偽の場合は"isbn"が"not_input"であれば真
+elif [ "${isbn}" = "not_input" ] ; then
 
-	# 偽の場合は対話的に処理
+	# 対話的に処理
 	while :
 	do
 	
-
-		# ====== 変数の処理 ======
 		# 入力が"Q"の場合に真,それ以外で偽
 		if [ "${isbn}" = "Q" ] ; then
 			
@@ -98,19 +99,12 @@ else
 			break
 	
 		# 偽の場合は引数の有無を確認,あれば真,無ければ偽
-		elif [ -n "${file}" ] ; then
+		elif [ -n "${1}" ] ; then
 	
 			# 保存先を引数で指定
 			file="${1}"
 
-		else 
-	
-			# 出力を捨てる
-			file="/dev/null"
-
 		fi
-		# ====== 変数の処理の終了 ======
-
 
 		# プロンプトを表示して入力を読み取る 
 		printf 'please enter ISBN > ' && read -r isbn
