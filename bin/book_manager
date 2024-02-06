@@ -1,4 +1,4 @@
-#!/bin/sh -eu
+#!/bin/sh
 
 # ====== 変数の設定 ======
 # 環境変数の設定
@@ -11,8 +11,10 @@ export POSIXLY_CORRECT=1
 # デフォルトの変数
 isbn="not_input"
 file="/dev/null"
+args="${1}"
 # ====== 変数の設定ここまで ======
 
+set -ue
 
 # apiを叩き,結果を加工
 hit_api(){
@@ -76,11 +78,17 @@ hit_api(){
 # 標準入力の有無を確認,あれば真,無ければ偽
 if [ -p /dev/stdin ] ; then
 
-	# 真の場合は標準入力を変数に代入,非対話的に処理
+	# 真の場合は"args"があれば"file"に代入
+	test -n "${args}" && file="${args}"
+
+	# 標準入力を変数に代入,非対話的に処理
 	isbn=$(cat - )
 
 	# apiを叩く
-	"hit_api"
+	"hit_api" |
+
+	# 指定ファイルに追記,指定されてない場合は/dev/nullへ
+	tee -a "${file}"
 
 # 偽の場合は"isbn"が"not_input"であれば真
 elif [ "${isbn}" = "not_input" ] ; then
