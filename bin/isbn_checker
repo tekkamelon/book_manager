@@ -22,25 +22,24 @@ BEGIN{
 		even_num += $i
 
 	# 奇数桁と偶数桁の3倍を合計
-	addition = odd_num+even_num * 3
-
-	# 10で割った剰余を求める
-	surplus = addition % 10
+	addition = odd_num + even_num * 3
 
 }
 
 END{
 
-	# 剰余が0なら真,それ以外で偽
-	if(surplus == 0){
+	# "addition"を10で割った剰余が0なら真,そうでなければ偽
+	if(addition % 10 == 0){
 
 		# 真の場合は入力内容をそのままを出力
 		print $0
 
 	}else{
 
-		# 偽の場合はエラーメッセージを出力
-		print "ISBN is bad!" > "/dev/stderr"
+		# 偽の場合はエラーメッセージを出力,エラー終了
+		print "Error: ISBN is bad!" > "/dev/stderr"
+
+		exit 1
 
 	}
 	
