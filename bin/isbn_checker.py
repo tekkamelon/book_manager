@@ -12,25 +12,26 @@ num_list = list(input)
 # "num_list"をint型にキャスト,"num_list_int"に代入
 num_list_int = []
 
-for data in num_list:
+for i in num_list:
 
-    num_list_int.append(int(data))
+    num_list_int.append(int(i))
 
-# リストの要素数を取得
-list_length = len(num_list)
+# 奇数桁の合計
+odd_num = sum(num_list_int[0::2])
 
-odd_num = (num_list_int[0::2])
+# 偶数桁の合計の3倍
+even_num = sum(num_list_int[1::2] * 3)
 
-even_num = (num_list_int[1::2])
+# 奇数桁と偶数桁の3倍を合計
+addition = odd_num + even_num
 
-print(odd_num)
-print(even_num)
-# tmp = 0
+# "addition"を10で割った剰余が0なら真,そうでなければ偽
+if addition % 10 == 0:
 
-# # "i"を0から"num_list"の要素数まで2ずつ増やす
-# for i in range(0, list_length, 2):
+    # 真の場合は入力内容をそのままを出力
+    print(input)
 
-#     sum_tmp = tmp + (num_list_int[i])
+else:
 
-#     sum_tmp2 = sum_tmp + (num_list_int[i] + 2)
-#     print(sum_tmp2)
+    # 偽の場合はエラーメッセージを出力.エラー終了
+    sys.exit("Error: ISBN is bad!")
