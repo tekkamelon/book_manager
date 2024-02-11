@@ -10,11 +10,7 @@ input = input.replace('\n', '')
 num_list = list(input)
 
 # "num_list"をint型にキャスト,"num_list_int"に代入
-num_list_int = []
-
-for i in num_list:
-
-    num_list_int.append(int(i))
+num_list_int = [int(i) for i in num_list]
 
 # 奇数桁の合計
 odd_num = sum(num_list_int[0::2])
@@ -33,5 +29,5 @@ if addition % 10 == 0:
 
 else:
 
-    # 偽の場合はエラーメッセージを出力.エラー終了
+    # 偽の場合はエラーメッセージを出力,エラー終了
     sys.exit("Error: ISBN is bad!")
