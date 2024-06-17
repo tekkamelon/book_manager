@@ -1,0 +1,82 @@
+#!/bin/sh
+
+# ====== 変数の設定 ======
+# 環境変数の設定
+export LC_ALL=C
+export LANG=C
+
+# GNU coreutilsの挙動をPOSIXに準拠
+export POSIXLY_CORRECT=1
+	
+args="${*}"
+
+if [ -p /dev/stdin ] ; then
+
+	# 真の場合は標準入力を変数に代入,非対話的に処理
+	isbn=$(cat - )
+
+elif [ -n "${args}" ] ; then
+
+	isbn="${args}"
+	
+fi
+
+set -ue
+# ====== 変数の設定ここまで ======
+
+
+# wgetがシステム内に存在するかを確認
+if type wget > /dev/null 2>&1 ; then
+
+	# wgetでapiを叩く
+	wget -q -O - "https://api.openbd.jp/v1/get?isbn=${isbn}&pretty"
+
+# curlがシステム内に存在するかを確認
+elif type curl > /dev/null 2>&1 ; then
+	
+	# curlでapiを叩く
+	curl -s "https://api.openbd.jp/v1/get?isbn=${isbn}&pretty"
+
+else
+
+	# wgetもcurlもない場合はメッセージを表示
+	echo 'please install "wget" or "curl"' 1>&2
+
+fi |
+
+# isbn,タイトル,出版社,発売日,著者を抽出
+grep -F -e "isbn" -e "title" -e "publisher" -e "pubdate" -e "author" |
+
+# 区切り文字をダブルクォートに指定
+awk -F "\"" '
+
+{
+
+	# 2フィールド目が"author""にマッチすれば真
+	if($2 == "author") {
+
+		# カンマを削除
+		gsub("," , "")
+
+		# "西暦-ダブルクォート"の部分を削除
+		gsub(/[0-9][0-9][0-9][0-9]-/ , "")
+		
+		# "西暦-西暦ダブルクォート"の部分を削除
+		gsub(/[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]/ , "")
+
+		# "末尾が西暦とダブルクォート"の部分を削除
+		gsub(/[0-9][0-9][0-9][0-9]\"$/ , "")
+		
+	}
+	
+	print $4
+
+}
+' |
+
+# 区切り文字をカンマに指定,列を行に置換
+paste -s -d ',' - |
+
+# 空行を削除
+sed '/^$/d'
+
