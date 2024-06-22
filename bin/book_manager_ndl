@@ -1,0 +1,143 @@
+#!/bin/sh
+
+# ====== 変数の設定 ======
+# 環境変数の設定
+export LC_ALL=C
+export LANG=C
+
+# GNU coreutilsの挙動をPOSIXに準拠
+export POSIXLY_CORRECT=1
+
+# デフォルトの変数
+isbn="not_input"
+	
+# 引数の有無を確認,あれば真,無ければ偽
+if [ -n "${1}" ] ; then
+
+	# 真の場合は保存先を引数で指定
+	file="${1}"
+
+else 
+
+	# 偽の場合は出力を捨てる
+	file="/dev/null"
+
+fi
+
+set -ue
+# ====== 変数の設定ここまで ======
+
+
+# apiを叩き,結果を加工
+parser(){
+
+	# wgetがシステム内に存在するかを確認
+	if type wget > /dev/null 2>&1 ; then
+
+		# wgetでapiを叩く
+		wget -q -O - "https://iss.ndl.go.jp/api/sru?operation=searchRetrieve&version=1.2&recordSchema=dcndl&onlyBib=true&recordPacking=xml&query=isbn=${isbn} AND dpid=iss-ndl-opac"
+
+	# curlがシステム内に存在するかを確認
+	# elif type curl > /dev/null 2>&1 ; then
+		
+	# 	# curlでapiを叩く
+	# 	curl -s "https://api.openbd.jp/v1/get?isbn=${isbn}&pretty"
+
+	else
+
+		# wgetもcurlもない場合はメッセージを表示
+		# echo 'Error: please install "wget" or "curl"' 1>&2
+		echo 'Error: please install "wget"' 1>&2
+
+	fi |
+
+	# isbn,タイトル,出版社,発売日,著者を抽出
+	grep -F -e "isbn" -e "<dcterms:title>" -e "<dc:creator>" -e "<foaf:name>" -e "<dcterms:date>" |
+
+	# 区切り文字に"<"と">"を指定,awk変数isbnにシェル変数を代入
+	awk -F "[<>]" -v isbn="${isbn}" '
+
+	BEGIN{
+
+		# isbnを出力
+		print isbn
+
+	}
+
+	# 1行目以外かつ3フィールド目に","がない行を処理
+	NR != 1 && $3 !~ /,/{
+
+		# 3フィールド目を出力
+		print $3	
+
+	}
+	' |
+
+	# 区切り文字をカンマに指定,列を行に置換
+	paste -s -d ',' - |
+
+	# 区切り文字をカンマに指定
+	awk -F"," '
+
+	BEGIN{
+
+		OFS = ","
+
+	}
+
+	{
+
+		$1 = $1
+		print $1, $2, $4, $5, $3
+
+	}
+	'
+
+}
+
+# 標準入力の有無を確認,あれば真,無ければ偽
+if [ -p /dev/stdin ] ; then
+
+	# 真の場合は標準入力を変数に代入,非対話的に処理
+	isbn=$(cat - )
+
+	# apiを叩く
+	parser |
+
+	tee -a "${file}"
+
+# 偽の場合は"isbn"が"not_input"であれば真
+elif [ "${isbn}" = "not_input" ] ; then
+
+	# 対話的に処理
+	while :
+	do
+	
+		# 入力が"Q"の場合に真,それ以外で偽
+		if [ "${isbn}" = "Q" ] ; then
+			
+			# メッセージを標準エラー出力に表示
+			echo "finish input" 1>&2
+	
+			# whileのループから脱出
+			break
+
+		fi
+
+		# プロンプトを表示して入力を読み取る 
+		printf 'please enter ISBN > ' && read -r isbn
+	
+		echo ""
+	
+		# apiを叩く
+		parser |
+
+		# 指定ファイルに追記,指定されてない場合は/dev/nullへ
+		tee -a "${file}"
+	
+		echo "" 
+	
+	done
+
+fi
+
