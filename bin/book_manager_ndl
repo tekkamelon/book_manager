@@ -52,7 +52,7 @@ parser(){
 	fi |
 
 	# isbn,タイトル,出版社,発売日,著者を抽出
-	grep -F -e "isbn" -e "<dcterms:title>" -e "<dc:creator>" -e "<foaf:name>" -e "<dcterms:date>" |
+	grep -F -e "<dcterms:title>" -e "<dc:creator>" -e "<foaf:name>" -e "<dcterms:date>" |
 
 	# 区切り文字に"<"と">"を指定,awk変数isbnにシェル変数を代入
 	awk -F "[<>]" -v isbn="${isbn}" '
@@ -64,8 +64,8 @@ parser(){
 
 	}
 
-	# 1行目以外かつ3フィールド目に","がない行を処理
-	NR != 1 && $3 !~ /,/{
+	# 3フィールド目に","がない行を処理
+	$3 !~ /,/{
 
 		# 3フィールド目を出力
 		print $3	
