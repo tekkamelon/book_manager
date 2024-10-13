@@ -1,0 +1,63 @@
+#!/bin/sh 
+
+# ====== 変数の設定 ======
+# 環境変数の設定
+export LC_ALL=C
+export LANG=C
+
+# GNU coreutilsの挙動をPOSIXに準拠
+export POSIXLY_CORRECT=1
+
+args="${*}"
+
+if [ -p /dev/stdin ] ; then
+
+	# 真の場合は標準入力を変数に代入,非対話的に処理
+	isbn=$(cat - )
+
+elif [ -n "${args}" ] ; then
+
+	isbn="${args}"
+	
+fi
+
+set -ue
+# ====== 変数の設定ここまで ======
+
+
+# wgetがシステム内に存在するかを確認
+if type wget > /dev/null 2>&1 ; then
+
+	# wgetでapiを叩く
+	wget -q -O - "https://ndlsearch.ndl.go.jp/api/opensearch?isbn=${isbn}"
+
+# curlがシステム内に存在するかを確認
+elif type curl > /dev/null 2>&1 ; then
+	
+	# curlでapiを叩く
+	curl -s "https://ndlsearch.ndl.go.jp/api/opensearch?isbn=${isbn}"
+
+else
+
+	# wgetもcurlもない場合はメッセージを表示
+	echo 'please install "wget" or "curl"' 1>&2
+
+fi |
+
+grep "<dc:subject xsi:type=\"dcndl:NDC9\"" |
+
+# 区切り文字に"<"と">"を指定,awk変数isbnにシェル変数を代入
+awk -F "[<>]" -v isbn="${isbn}" '
+
+BEGIN{
+
+	OFS = ","
+
+}
+{
+
+	print isbn,$3
+
+}
+'
+
