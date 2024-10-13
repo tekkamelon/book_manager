@@ -35,47 +35,40 @@ parser(){
 	if type wget > /dev/null 2>&1 ; then
 
 		# wgetでapiを叩く
-		wget -q -O - "https://api.openbd.jp/v1/get?isbn=${isbn}&pretty"
+		wget -q -O - "https://iss.ndl.go.jp/api/sru?operation=searchRetrieve&version=1.2&recordSchema=dcndl&onlyBib=true&recordPacking=xml&query=isbn=${isbn} AND dpid=iss-ndl-opac"
 
 	# curlがシステム内に存在するかを確認
-	elif type curl > /dev/null 2>&1 ; then
+	# elif type curl > /dev/null 2>&1 ; then
 		
-		# curlでapiを叩く
-		curl -s "https://api.openbd.jp/v1/get?isbn=${isbn}&pretty"
+	# 	# curlでapiを叩く
+	# 	curl -s "https://api.openbd.jp/v1/get?isbn=${isbn}&pretty"
 
 	else
 
 		# wgetもcurlもない場合はメッセージを表示
-		echo 'Error: please install "wget" or "curl"' 1>&2
+		# echo 'Error: please install "wget" or "curl"' 1>&2
+		echo 'Error: please install "wget"' 1>&2
 
 	fi |
 
 	# isbn,タイトル,出版社,発売日,著者を抽出
-	grep -F -e "isbn" -e "title" -e "publisher" -e "pubdate" -e "author" |
+	grep -F -e "<dcterms:title>" -e "<dc:creator>" -e "<foaf:name>" -e "<dcterms:date>" |
 
-	# 区切り文字をダブルクォートに指定
-	awk -F "\"" '
+	# 区切り文字に"<"と">"を指定,awk変数isbnにシェル変数を代入
+	awk -F "[<>]" -v isbn="${isbn}" '
 
-	{
+	BEGIN{
 
-		# 2フィールド目が"author""にマッチすれば真
-		if($2 == "author") {
+		# isbnを出力
+		print isbn
 
-			# カンマを削除
-			gsub("," , "")
+	}
 
-			# "西暦-ダブルクォート"の部分を削除
-			gsub(/[0-9][0-9][0-9][0-9]-/ , "")
-			
-			# "西暦-西暦ダブルクォート"の部分を削除
-			gsub(/[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]/ , "")
+	# 3フィールド目に","がない行を処理
+	$3 !~ /,/{
 
-			# "末尾が西暦とダブルクォート"の部分を削除
-			gsub(/[0-9][0-9][0-9][0-9]\"$/ , "")
-			
-		}
-		
-		print $4
+		# 3フィールド目を出力
+		print $3	
 
 	}
 	' |
@@ -83,8 +76,22 @@ parser(){
 	# 区切り文字をカンマに指定,列を行に置換
 	paste -s -d ',' - |
 
-	# 空行を削除
-	sed '/^$/d'
+	# 区切り文字をカンマに指定
+	awk -F"," '
+
+	BEGIN{
+
+		OFS = ","
+
+	}
+
+	{
+
+		$1 = $1
+		print $1, $2, $4, $5, $3
+
+	}
+	'
 
 }
 
