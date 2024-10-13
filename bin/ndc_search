@@ -1,5 +1,7 @@
 #!/bin/sh 
 
+set -e
+
 # ====== 変数の設定 ======
 # 環境変数の設定
 export LC_ALL=C
@@ -7,6 +9,7 @@ export LANG=C
 
 # GNU coreutilsの挙動をPOSIXに準拠
 export POSIXLY_CORRECT=1
+
 
 args="${*}"
 
@@ -21,9 +24,10 @@ elif [ -n "${args}" ] ; then
 	
 fi
 
-set -ue
+# set -ue
 # ====== 変数の設定ここまで ======
 
+set -u
 
 # wgetがシステム内に存在するかを確認
 if type wget > /dev/null 2>&1 ; then
@@ -44,19 +48,22 @@ else
 
 fi |
 
-grep "<dc:subject xsi:type=\"dcndl:NDC9\"" |
+grep "<dc:subject xsi:type=\"dcndl:NDC[0-9]*\"" |
 
 # 区切り文字に"<"と">"を指定,awk変数isbnにシェル変数を代入
 awk -F "[<>]" -v isbn="${isbn}" '
 
 BEGIN{
 
+	# 出力時の区切り文字をカンマに指定
 	OFS = ","
 
 }
-{
 
-	print isbn,$3
+# NDC9とNDC10が両方ある場合はNDC10のみ出力
+END{
+
+	print isbn, $3
 
 }
 '
