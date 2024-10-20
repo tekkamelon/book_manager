@@ -1,0 +1,40 @@
+#!/bin/sh 
+
+set -eu
+
+# ====== 変数の設定 ======
+# 環境変数の設定
+export LC_ALL=C
+export LANG=C
+
+# GNU coreutilsの挙動をPOSIXに準拠
+export POSIXLY_CORRECT=1
+
+# デフォルトの変数
+# isbn="not_input"
+	
+# 引数の有無を確認,あれば真,無ければ偽
+if [ -n "${1}" ] ; then
+
+	# 真の場合は保存先を引数で指定
+	file="${1}"
+
+# else 
+
+	# 偽の場合は出力を捨てる
+	# file="/dev/null"
+
+fi
+
+# ====== 変数の設定ここまで ======
+
+
+# 変数"line"を宣言し一行ずつファイルを読み込む
+while read -r line
+
+	do
+
+		echo "${line}" | cut -d"," -f1
+
+	done < "${file}"
+
