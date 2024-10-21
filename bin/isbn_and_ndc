@@ -10,11 +10,20 @@ export LANG=C
 # GNU coreutilsの挙動をPOSIXに準拠
 export POSIXLY_CORRECT=1
 
+# 処理元のファイル
 # 引数の有無を確認,あれば真,無ければ偽
 if [ -n "${1}" ] ; then
 
 	# 真の場合は保存先を引数で指定
-	file="${1}"
+	source_file="${1}"
+
+fi
+
+# 保存先のファイル
+if [ -n "${2}" ] ; then
+
+	# 真の場合は保存先を引数で指定
+	export_file="${2}"
 
 fi
 
@@ -34,7 +43,7 @@ while read -r line
 		# "num"を5で割った剰余が0出ない場合に真
 		if [ $((num % 5)) != 0 ] ; then
 
-			echo "${line}" | cut -d"," -f1 | ndc_search
+			echo "${line}" | cut -d"," -f1 | ndc_search | tee -a "${export_file}"
 
 		else
 
@@ -42,5 +51,5 @@ while read -r line
 
 		fi
 
-	done < "${file}"
+	done < "${source_file}"
 
