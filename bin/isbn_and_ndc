@@ -10,22 +10,16 @@ export LANG=C
 # GNU coreutilsの挙動をPOSIXに準拠
 export POSIXLY_CORRECT=1
 
-# デフォルトの変数
-# isbn="not_input"
-	
 # 引数の有無を確認,あれば真,無ければ偽
 if [ -n "${1}" ] ; then
 
 	# 真の場合は保存先を引数で指定
 	file="${1}"
 
-# else 
-
-	# 偽の場合は出力を捨てる
-	# file="/dev/null"
-
 fi
 
+# デフォルトの変数
+num="0"
 # ====== 変数の設定ここまで ======
 
 
@@ -34,7 +28,19 @@ while read -r line
 
 	do
 
-		echo "${line}" | cut -d"," -f1
+		# 変数"num"を1ずつインクリメント
+		num=$((num + 1))
+
+		# "num"を5で割った剰余が0出ない場合に真
+		if [ $((num % 5)) != 0 ] ; then
+
+			echo "${line}" | cut -d"," -f1 | ndc_search
+
+		else
+
+			sleep 3
+
+		fi
 
 	done < "${file}"
 
