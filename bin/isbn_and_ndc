@@ -32,24 +32,27 @@ num="0"
 # ====== 変数の設定ここまで ======
 
 
-# 変数"line"を宣言し一行ずつファイルを読み込む
+# 変数lineを宣言し一行ずつファイルを読み込む
 while read -r line
 
 	do
 
-		# 変数"num"を1ずつインクリメント
+		# 変数numを1ずつインクリメント
 		num=$((num + 1))
 
-		# "num"を5で割った剰余が0出ない場合に真
+		# numを5で割った剰余が0出ない場合に真
 		if [ $((num % 5)) != 0 ] ; then
 
+			# ISBN飲みを抽出,"ndc_search"に渡しteeで保存
 			echo "${line}" | cut -d"," -f1 | ndc_search | tee -a "${export_file}"
 
 		else
 
-			sleep 3
+			# サーバーへの負荷を抑えるために5秒間sleep
+			sleep 5
 
 		fi
 
+	# 指定されたファイルを読み込み
 	done < "${source_file}"
 
