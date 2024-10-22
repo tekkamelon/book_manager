@@ -27,10 +27,30 @@ if [ -n "${2}" ] ; then
 
 fi
 
-# デフォルトの変数
+# カウンタ変数
 num="0"
 # ====== 変数の設定ここまで ======
 
+
+# ===== 関数の宣言 ======
+# 名前付きパイプを削除,スクリプトを終了
+sigint_handler () {
+
+	rm sep_file.fifo
+
+	exit 0
+
+}
+# ===== 関数の宣言ここまで ======
+
+
+# INTシグナルを受け取った場合の処理
+trap sigint_handler INT
+
+mkfifo sep_file.fifo
+
+# 予めファイルからISBNのみを抽出
+cut -d"," -f1 "${source_file}" > sep_file.fifo &
 
 # 変数lineを宣言し一行ずつファイルを読み込む
 while read -r line
@@ -40,11 +60,11 @@ while read -r line
 		# 変数numを1ずつインクリメント
 		num=$((num + 1))
 
-		# numを5で割った剰余が0出ない場合に真
+		# numを5で割った剰余が0でない場合に真
 		if [ $((num % 5)) != 0 ] ; then
 
-			# ISBN飲みを抽出,"ndc_search"に渡しteeで保存
-			echo "${line}" | cut -d"," -f1 | ndc_search | tee -a "${export_file}"
+			# ISBNのみを"ndc_search"に渡しteeで保存
+			echo "${line}" | ndc_search | tee -a "${export_file}"
 
 		else
 
@@ -53,6 +73,8 @@ while read -r line
 
 		fi
 
-	# 指定されたファイルを読み込み
-	done < "${source_file}"
+	# 名前付きパイプを読み込み
+	done < sep_file.fifo
+
+rm sep_file.fifo
 
