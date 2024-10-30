@@ -58,20 +58,22 @@ elif [ "${isbn}" = "not_input" ] ; then
 			# whileのループから脱出
 			exit 0	
 
+		else
+
+			# プロンプトを表示して入力を読み取る 
+			printf 'please enter ISBN > ' && read -r isbn
+		
+			echo ""
+		
+			# apiを叩く
+			echo "${isbn}" | bm_core |
+
+			# 指定ファイルに追記,指定されてない場合は/dev/nullへ
+			tee -a "${file}"
+		
+			echo "" 
+
 		fi
-
-		# プロンプトを表示して入力を読み取る 
-		printf 'please enter ISBN > ' && read -r isbn
-	
-		echo ""
-	
-		# apiを叩く
-		echo "${isbn}" | bm_core |
-
-		# 指定ファイルに追記,指定されてない場合は/dev/nullへ
-		tee -a "${file}"
-	
-		echo "" 
 	
 	done
 
