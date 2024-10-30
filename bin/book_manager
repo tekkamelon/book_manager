@@ -1,6 +1,5 @@
 #!/bin/sh
 
-
 # ====== 変数の設定 ======
 # 環境変数の設定
 export LC_ALL=C
@@ -35,26 +34,29 @@ set -u
 while :
 do
 
-	# 入力が"Q"以外若しくは初期値の場合に真,それ以外で偽
-	if [ "${isbn}" != "Q" ] ; then
+	# ループで実行される処理の始まり
+	# 入力が初期値若しくは"Q"以外の場合に真,それ以外で偽
+	if [ "${isbn}" = "not_input" ] || [ "${isbn}" != "Q" ] ; then
 		
 		# プロンプトを表示して入力を読み取る 
 		printf 'please enter ISBN > ' && read -r isbn
 	
-		echo ""
-	
-		# apiを叩く
-		echo "${isbn}" | bm_core |
+			# 読み取った入力が"Q"以外であれば真
+			if [ "${isbn}" != "Q" ] ; then
 
-		# 指定ファイルに追記,指定されてない場合は/dev/nullへ
-		tee -a "${file}"
-	
-		echo "" 
+				echo ""
+			
+				# apiを叩く
+				echo "${isbn}" | bm_core |
 
-	else
+				# 指定ファイルに追記,指定されてない場合は/dev/nullへ
+				tee -a "${file}"
+			
+				echo "" 
 
-		# メッセージを標準エラー出力に表示
-		echo "finish input" 1>&2
+			fi
+
+	elif [ "${isbn}" = "Q" ] ; then 
 
 		# whileのループから脱出
 		exit 0	
