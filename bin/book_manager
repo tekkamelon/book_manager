@@ -1,6 +1,5 @@
 #!/bin/sh
 
-set -e
 
 # ====== 変数の設定 ======
 # 環境変数の設定
@@ -12,6 +11,8 @@ export POSIXLY_CORRECT=1
 
 # デフォルトの変数
 isbn="not_input"
+
+set -e
 	
 # 引数の有無を確認,あれば真,無ければ偽
 if [ -n "${1}" ] ; then
@@ -26,26 +27,17 @@ else
 
 fi
 
+set -u
 # ====== 変数の設定ここまで ======
 
-
-set -u
 
 # 対話的に処理
 while :
 do
 
-	# 入力が"Q"の場合に真,それ以外で偽
-	if [ "${isbn}" = "Q" ] ; then
+	# 入力が"Q"以外若しくは初期値の場合に真,それ以外で偽
+	if [ "${isbn}" != "Q" ] ; then
 		
-		# メッセージを標準エラー出力に表示
-		echo "finish input" 1>&2
-
-		# whileのループから脱出
-		exit 0	
-
-	else
-
 		# プロンプトを表示して入力を読み取る 
 		printf 'please enter ISBN > ' && read -r isbn
 	
@@ -58,6 +50,14 @@ do
 		tee -a "${file}"
 	
 		echo "" 
+
+	else
+
+		# メッセージを標準エラー出力に表示
+		echo "finish input" 1>&2
+
+		# whileのループから脱出
+		exit 0	
 
 	fi
 
