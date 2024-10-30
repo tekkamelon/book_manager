@@ -31,51 +31,35 @@ fi
 
 set -u
 
-# 標準入力の有無を確認,あれば真,無ければ偽
-if [ -p /dev/stdin ] ; then
+# 対話的に処理
+while :
+do
 
-	# 真の場合は標準入力を変数に代入,非対話的に処理
-	isbn=$(cat - )
-
-	# apiを叩く
-	echo "${isbn}" | bm_core |
-
-	tee -a "${file}"
-
-# 偽の場合は"isbn"が"not_input"であれば真
-elif [ "${isbn}" = "not_input" ] ; then
-
-	# 対話的に処理
-	while :
-	do
-	
-		# 入力が"Q"の場合に真,それ以外で偽
-		if [ "${isbn}" = "Q" ] ; then
-			
-			# メッセージを標準エラー出力に表示
-			echo "finish input" 1>&2
-	
-			# whileのループから脱出
-			exit 0	
-
-		else
-
-			# プロンプトを表示して入力を読み取る 
-			printf 'please enter ISBN > ' && read -r isbn
+	# 入力が"Q"の場合に真,それ以外で偽
+	if [ "${isbn}" = "Q" ] ; then
 		
-			echo ""
-		
-			# apiを叩く
-			echo "${isbn}" | bm_core |
+		# メッセージを標準エラー出力に表示
+		echo "finish input" 1>&2
 
-			# 指定ファイルに追記,指定されてない場合は/dev/nullへ
-			tee -a "${file}"
-		
-			echo "" 
+		# whileのループから脱出
+		exit 0	
 
-		fi
+	else
+
+		# プロンプトを表示して入力を読み取る 
+		printf 'please enter ISBN > ' && read -r isbn
 	
-	done
+		echo ""
+	
+		# apiを叩く
+		echo "${isbn}" | bm_core |
 
-fi
+		# 指定ファイルに追記,指定されてない場合は/dev/nullへ
+		tee -a "${file}"
+	
+		echo "" 
+
+	fi
+
+done
 
