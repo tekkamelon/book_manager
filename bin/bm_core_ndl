@@ -1,0 +1,88 @@
+#!/bin/sh
+
+# ====== 変数の設定 ======
+# 環境変数の設定
+export LC_ALL=C
+export LANG=C
+
+# GNU coreutilsの挙動をPOSIXに準拠
+export POSIXLY_CORRECT=1
+	
+args="${*}"
+
+if [ -p /dev/stdin ] ; then
+
+	# 真の場合は標準入力を変数に代入,非対話的に処理
+	isbn=$(cat - )
+
+elif [ -n "${args}" ] ; then
+
+	isbn="${args}"
+	
+fi
+
+set -ue
+# ====== 変数の設定ここまで ======
+
+
+# wgetがシステム内に存在するかを確認
+if type wget > /dev/null 2>&1 ; then
+
+	# wgetでapiを叩く
+	wget -q -O - "https://iss.ndl.go.jp/api/sru?operation=searchRetrieve&version=1.2&recordSchema=dcndl&onlyBib=true&recordPacking=xml&query=isbn=${isbn} AND dpid=iss-ndl-opac"
+
+# curlがシステム内に存在するかを確認
+elif type curl > /dev/null 2>&1 ; then
+	
+	# curlでapiを叩く
+	curl -L -s "https://iss.ndl.go.jp/api/sru?operation=searchRetrieve&version=1.2&recordSchema=dcndl&onlyBib=true&recordPacking=xml&query=isbn=${isbn}%20AND%20dpid=iss-ndl-opac"
+
+else
+
+	# wgetもcurlもない場合はメッセージを表示
+	echo 'please install "wget" or "curl"' 1>&2
+
+fi |
+
+# isbn,タイトル,出版社,発売日,著者を抽出
+grep -F -e "<dcterms:title>" -e "<dc:creator>" -e "<foaf:name>" -e "<dcterms:date>" |
+
+# 区切り文字に"<"と">"を指定,awk変数isbnにシェル変数を代入
+awk -F "[<>]" -v isbn="${isbn}" '
+
+BEGIN{
+
+	# isbnを出力
+	print isbn
+
+}
+
+# 3フィールド目に","がない行を処理
+$3 !~ /,/{
+
+	# 3フィールド目を出力
+	print $3	
+
+}
+' |
+
+# 区切り文字をカンマに指定,列を行に置換
+paste -s -d ',' - |
+
+# 区切り文字をカンマに指定
+awk -F"," '
+
+BEGIN{
+
+	OFS = ","
+
+}
+
+{
+
+	$1 = $1
+	print $1, $2, $4, $5, $3
+
+}
+'
+
