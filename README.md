@@ -20,6 +20,19 @@ cp book_manager/bin/* [PATHの通ったディレクトリ]
 
 ## how to use
 
+### bm_core,bm_core_ndl
+```sh
+# bm_core_ndlも同様 
+# パイプでISBNコードを渡す
+echo "9782379890062" | bm_core
+
+# 引数で渡す
+ bm_core "9782379890062"
+```
+
+パイプもしくは引数でISBNを渡すと前者はopenBD,後者は国立国会図書館のAPIを使用しデータを取得,
+"ISBN,タイトル,著者名,出版社,発売日"の形式で出力
+
 ### book_manager,book_manager_ndl
 ```sh
 # 保存先を引数としてスクリプトを起動,book_manager_ndlも同様
