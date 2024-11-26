@@ -6,34 +6,35 @@
 ```sh
 # linux及びmacOS
 # githubよりclone
-$ git clone https://github.com/tekkamelon/book_manager
+git clone https://github.com/tekkamelon/book_manager
 
 # スクリプトのあるディレクトリへ移動
-$ cd book_manager/bin/
+cd book_manager/bin/
 
 # 実行権限を付与
-$ chmod 755 *
+chmod 755 *
 ```
 
 ## how to use
 
-### book_manager
+### book_manager,book_manager_ndl
 ```sh
-# 保存先を引数としてスクリプトを起動
-$ ./book_manager.sh [保存先のディレクトリ,ファイル名]
+# 保存先を引数としてスクリプトを起動,book_manager_ndlも同様
+./book_manager [保存先のディレクトリ,ファイル名]
 ```
 
-ISBNを入力するとopenBDからデータを取得,  
-第1引数に指定されたファイル(引数がない場合は何もせず終了)に  
+ISBNを入力すると前者は`bm_core`,後者は`bm_core_ndl`を使用しデータを取得,  
+第1引数に指定されたファイルに  
 "ISBN,タイトル,著者名,出版社,発売日"の形式で保存  
+引数がない場合はデータの出力のみ
 "shift+q"を入力で終了
 
 ### isbn_checker,isbn_checker.py
 ```sh
 # パイプでISBNコードを渡す
-$ echo "9782379890062" | ./isbn_checker
+echo "9782379890062" | ./isbn_checker
 
-$ echo "9782379890062" | ./isbn_checker.py
+echo "9782379890062" | ./isbn_checker.py
 ```
 
 パイプで渡されたISBNを検算,正しければそのまま出力,間違っていればエラーメッセージを出力しエラー終了
@@ -41,7 +42,7 @@ $ echo "9782379890062" | ./isbn_checker.py
 ### csrch
 ```sh
 # 検索するファイルを引数として起動
-$ csrch ~/hoge/fuga.csv
+csrch ~/hoge/fuga.csv
 
 # 検索するワードを入力
 search word:
