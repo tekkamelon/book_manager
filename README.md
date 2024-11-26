@@ -13,6 +13,9 @@ cd book_manager/bin/
 
 # 実行権限を付与
 chmod 755 *
+
+# スクリプトを配置
+cp book_manager/bin/* [PATHの通ったディレクトリ]
 ```
 
 ## how to use
@@ -20,7 +23,7 @@ chmod 755 *
 ### book_manager,book_manager_ndl
 ```sh
 # 保存先を引数としてスクリプトを起動,book_manager_ndlも同様
-./book_manager [保存先のディレクトリ,ファイル名]
+book_manager [保存先のディレクトリ,ファイル名]
 ```
 
 ISBNを入力すると前者は`bm_core`,後者は`bm_core_ndl`を使用しデータを取得,  
@@ -32,9 +35,9 @@ ISBNを入力すると前者は`bm_core`,後者は`bm_core_ndl`を使用しデ�
 ### isbn_checker,isbn_checker.py
 ```sh
 # パイプでISBNコードを渡す
-echo "9782379890062" | ./isbn_checker
+echo "9782379890062" | isbn_checker
 
-echo "9782379890062" | ./isbn_checker.py
+echo "9782379890062" | isbn_checker.py
 ```
 
 パイプで渡されたISBNを検算,正しければそのまま出力,間違っていればエラーメッセージを出力しエラー終了
