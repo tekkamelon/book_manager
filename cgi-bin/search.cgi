@@ -20,7 +20,7 @@ export PATH="$PATH:../bin"
 file () {
 
 	# 動作テストのためハードコード
-	c2h /home/tekkamelon/Documents/library/library.csv | grep -F -v "<html>"
+	c2h -v header=no /home/tekkamelon/Documents/library/library.csv
 
 }
 
