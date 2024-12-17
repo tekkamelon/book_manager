@@ -8,14 +8,27 @@
 		<link rel="stylesheet" href="https://newcss.net/new.min.css">
 		<title>Search - Book Manager -</title>
 
+		<!-- 初回アクセス時にもCGIを呼び出す -->
+		<script>
+
+			function autoSubmit() {
+
+				// ページのロード時にformを自動送信
+				document.getElementById("queryForm").submit();
+
+			}
+
+		</script>
+
+
     </head>
 
-	<body>
+	<body onload="autoSubmit()">
 
 		<p>book manager</p>
 
 		<!-- 検索ワードをGETメソッドで送信,結果の表示先に"result"を指定 -->
-		<form action="/cgi-bin/search.cgi" method="GET" target="resizeIframe">
+		<form id=queryForm action="/cgi-bin/search.cgi" method="GET" target="resizeIframe">
 
 			<input type="text" id="name" placeholder="search word" name="name">
 			<input type="submit" value="Search">
@@ -25,7 +38,7 @@
 		<!-- CGIで処理した結果を表示 -->
 		<iframe name="resizeIframe" id="resizeIframe" width="100%" height="200px" onload="resizeIframe(this)"></iframe>
 
-		<!-- 結果に応じて縦幅を変更する -->
+		<!-- 結果に応じて縦幅を変更 -->
 		<script>
 
 			function resizeIframe(iframe) {
