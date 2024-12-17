@@ -14,9 +14,27 @@
 
 		<p>book manager</p>
 
-		<form action="/cgi-bin/search.cgi" method="post">
-			<input type="submit" value="Print">
+		<!-- 検索ワードをGETメソッドで送信,結果の表示先に"result"を指定 -->
+		<form action="/cgi-bin/search.cgi" method="GET" target="resizeIframe">
+
+			<input type="text" id="name" placeholder="search word" name="name">
+			<input type="submit" value="Search">
+
 		</form>
+
+		<!-- CGIで処理した結果を表示 -->
+		<iframe name="resizeIframe" id="resizeIframe" width="100%" height="200px" onload="resizeIframe(this)"></iframe>
+
+		<!-- 結果に応じて縦幅を変更する -->
+		<script>
+
+			function resizeIframe(iframe) {
+
+				iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px'; 
+
+			}
+
+		</script>
 
 	</body>
 
