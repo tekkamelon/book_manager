@@ -17,12 +17,23 @@ export POSIXLY_CORRECT=1
 # 独自コマンドへPATHを通す
 export PATH="$PATH:../bin"
 
+# クエリをデコードし"search_str"に代入
+search_str=$(echo "${QUERY_STRING#*\=}" | urldecode)
+
+# csvファイル
+# 動作テストのためハードコード
+csv_file=/home/tekkamelon/Documents/library/library.csv
+# ====== 変数の設定ここまで ======
+
+
+# ===== 関数の宣言 ======
 file () {
 
-	# 動作テストのためハードコード
-	c2h -v header=no /home/tekkamelon/Documents/library/library.csv
+	grep -F "${search_str}" < "${csv_file}" | c2h -v header=no 
 
 }
+# ===== 関数の宣言ここまで ======
+
 
 echo "Content-type: text/html"
 echo ""
