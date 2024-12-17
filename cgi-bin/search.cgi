@@ -29,7 +29,18 @@ csv_file=/home/tekkamelon/Documents/library/library.csv
 # ===== 関数の宣言 ======
 file () {
 
-	grep -F "${search_str}" < "${csv_file}" | c2h -v header=no 
+	# "search_str"があれば真
+	if [ -n "${search_str}" ] ; then
+
+		# 固定文字列かつ大文字小文字の区別をせずに検索
+		grep -F -i "${search_str}" < "${csv_file}" | c2h -v header=no 
+
+	else
+
+		# csvファイルをhtml化し出力
+		c2h -v header=no "${csv_file}"
+
+	fi
 
 }
 # ===== 関数の宣言ここまで ======
