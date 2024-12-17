@@ -63,7 +63,7 @@ cat << EOS
 
 	<body>
 		$(file)
-	</body>
+	</body onload=\"parent.postMessage({iframeHeight: document.documentElement.scrollHeight}, '*');\">
 
 </html>
 EOS

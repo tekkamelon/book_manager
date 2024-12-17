@@ -8,18 +8,36 @@
 		<link rel="stylesheet" href="https://newcss.net/new.min.css">
 		<title>Search - Book Manager -</title>
 
-		<!-- 初回アクセス時にもCGIを呼び出す -->
 		<script>
 
-			function autoSubmit() {
+			// 初回アクセス時にもCGIを呼び出す
+			 function autoSubmit() {
 
-				// ページのロード時にformを自動送信
-				document.getElementById("queryForm").submit();
+			// ページのロード時にformを自動送信
+			document.getElementById("queryForm").submit();
 
 			}
 
-		</script>
+			// 結果に応じて縦幅を変更
+			function resizeIframe(iframe) {
 
+				iframe.style.height = iframe.contentWindow.document.documentElement.scrollHeight + 'px';
+
+			}
+
+			// iframeのサイズ変更を取得
+			window.addEventListener('message', function(event) {
+
+				if (event.data && event.data.iframeHeight) {
+
+					var iframe = document.getElementById('cgiFrame');
+
+					iframe.style.height = event.data.iframeHeight + 'px';
+				}
+
+			});
+
+		</script>
 
     </head>
 
@@ -28,7 +46,7 @@
 		<p>book manager</p>
 
 		<!-- 検索ワードをGETメソッドで送信,結果の表示先に"result"を指定 -->
-		<form id=queryForm action="/cgi-bin/search.cgi" method="GET" target="resizeIframe">
+		<form id=queryForm action="/cgi-bin/search.cgi" method="GET" target="cgiFrame" onsubmit="resizeIframe(document.getElementById('cgiFrame'));">
 
 			<input type="text" id="name" placeholder="search word" name="name">
 			<input type="submit" value="Search">
@@ -36,18 +54,7 @@
 		</form>
 
 		<!-- CGIで処理した結果を表示 -->
-		<iframe name="resizeIframe" id="resizeIframe" width="100%" height="200px" onload="resizeIframe(this)"></iframe>
-
-		<!-- 結果に応じて縦幅を変更 -->
-		<script>
-
-			function resizeIframe(iframe) {
-
-				iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px'; 
-
-			}
-
-		</script>
+		<iframe name="cgiFrame" id="resizeIframe" width="100%" height="200px" onload="resizeIframe(this)"></iframe>
 
 	</body>
 
@@ -57,7 +64,7 @@
 		<button class="equal_width_button" onclick="location.href='/index.html'">HOME</button>
 		<button class="equal_width_button" onclick="location.href='/input/input.html'">Input</button>
 		<button class="equal_width_button" onclick="location.href='/edit/edit.html'">Edit</button>
-		<button class="equal_width_button" onclick="location.href='/settings/settings.html'">Setting</button>
+		<button class="equal_width_button" onclick="location.href='/settings/settings.html'">Settings</button>
 
 	</footer>
 
