@@ -21,6 +21,9 @@ elif [ -n "${args}" ] ; then
 	
 fi
 
+# ndc_searchでndcを取得,変数に代入
+ndc=$(ndc_search "${isbn}" | cut -d, -f2)
+
 set -ue
 # ====== 変数の設定ここまで ======
 
@@ -42,10 +45,10 @@ else
 	# wgetもcurlもない場合はメッセージを表示
 	echo 'please install "wget" or "curl"' 1>&2
 
-fi |
+fi | 
 
 # isbn,タイトル,出版社,発売日,著者を抽出
-grep -F -e "<dcterms:title>" -e "<dc:creator>" -e "<foaf:name>" -e "<dcterms:date>" |
+grep -F -e "<dcterms:title>" -e "<dc:creator>" -e "<foaf:name>" -e "<dcterms:date>" | 
 
 # 区切り文字に"<"と">"を指定,awk変数isbnにシェル変数を代入
 awk -F "[<>]" -v isbn="${isbn}" '
@@ -69,8 +72,8 @@ $3 !~ /,/{
 # 区切り文字をカンマに指定,列を行に置換
 paste -s -d ',' - |
 
-# 区切り文字をカンマに指定
-awk -F"," '
+# 区切り文字をカンマに指定,ndcにシェル変数ndcを代入
+awk -F"," -v ndc="${ndc}" '
 
 BEGIN{
 
@@ -80,8 +83,11 @@ BEGIN{
 
 {
 
+	# 列の並べ替え
 	$1 = $1
-	print $1, $2, $4, $5, $3
+
+	# $6は海外本の訳者
+	print $1, $2, $4, $5, $3, $6, ndc
 
 }
 '
