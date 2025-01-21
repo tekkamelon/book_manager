@@ -17,12 +17,8 @@ second_arg="${2}"
 # isbnをパイプで受け取った場合
 if [ -p /dev/stdin ] ; then
 
-	# 真の場合は標準入力を変数に代入
+	# 真の場合は標準入力を変数に代入,非対話的に処理
 	isbn=$(cat - )
-
-	# 他のシェルスクリプトから呼び出された場合の処理
-	# isbnが空であればisbnにfirst_argを代入
-	test -z "${isbn}" && isbn="${first_arg}"
 
 	# second_argに第1引数を代入
 	second_arg="${first_arg}"
