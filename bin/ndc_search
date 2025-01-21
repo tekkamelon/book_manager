@@ -18,7 +18,17 @@ if [ -p /dev/stdin ] ; then
 	# 真の場合は標準入力を変数に代入,非対話的に処理
 	isbn=$(cat - )
 
+<<<<<<< HEAD
 elif [ -n "${args}" ] ; then
+=======
+	# second_argに第1引数を代入
+	second_arg="${first_arg}"
+
+# 第1引数が1以上の数値であれば真
+elif [ "${first_arg}" -gt 0 ] ; then
+
+	isbn="${first_arg}"
+>>>>>>> origin/develop
 
 	isbn="${args}"
 	
