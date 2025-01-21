@@ -22,7 +22,7 @@ elif [ -n "${args}" ] ; then
 fi
 
 # ndc_searchでndcを取得,変数に代入
-ndc=$(echo "${isbn}" | ndc_search ndc_only)
+ndc=$(ndc_search "${isbn}" | cut -d, -f2)
 
 set -ue
 # ====== 変数の設定ここまで ======
