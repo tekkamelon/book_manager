@@ -21,9 +21,6 @@ elif [ -n "${args}" ] ; then
 	
 fi
 
-# ndc_searchでndcを取得,変数に代入
-ndc=$(ndc_search "${isbn}" | cut -d, -f2)
-
 set -ue
 # ====== 変数の設定ここまで ======
 
@@ -50,8 +47,8 @@ fi |
 # isbn,タイトル,出版社,発売日,著者を抽出
 grep -F -e "isbn" -e "title" -e "publisher" -e "pubdate" -e "author" |
 
-# 区切り文字をダブルクォートに指定,awk変数ndcにシェル変数を代入
-awk -F "\"" -v ndc="${ndc}" '
+# 区切り文字をダブルクォートに指定
+awk -F "\"" '
 
 {
 
@@ -73,13 +70,6 @@ awk -F "\"" -v ndc="${ndc}" '
 	}
 	
 	print $4
-
-}
-
-END{
-
-	# ndcを出力
-	print ndc
 
 }
 ' |
