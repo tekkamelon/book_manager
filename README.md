@@ -32,6 +32,7 @@ bm_core "9782379890062"
 
 パイプもしくは引数でISBNを渡すと前者はopenBD,後者は国立国会図書館のAPIを使用しデータを取得,
 "ISBN,タイトル,著者名,出版社,発売日"の形式で出力
+bm_core_ndlは[parsrx.sh](https://github.com/ShellShoccar-jpn/Parsrs/blob/master/parsrx.sh)を使用しているため,`parsrx.sh`があるディレクトリにパスが通っている必要がある
 
 ### book_manager,book_manager_ndl
 ```sh
