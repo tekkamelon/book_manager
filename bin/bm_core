@@ -42,6 +42,9 @@ else
 	# wgetもcurlもない場合はメッセージを表示
 	echo 'please install "wget" or "curl"' 1>&2
 
+	# スクリプトをエラー終了
+	exit 1
+
 fi |
 
 # isbn,タイトル,出版社,発売日,著者を抽出
