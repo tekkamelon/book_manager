@@ -8,19 +8,25 @@ export LANG=C
 # GNU coreutilsの挙動をPOSIXに準拠
 export POSIXLY_CORRECT=1
 
-# デフォルトのAPIを設定
+set -u
+set -e
+
+# デフォルトの変数を設定
 api="openbd"
+result=""
 
 # 引数を評価
 case "${1}" in
 
+	# -n オプションを指定した場合は国立国会図書館を使用
 	"-n")
 
 		api="ndl"
 		shift
 
 		;;
-
+	
+	# -o オプションを指定した場合はopenBDを使用
 	"-o")
 
 		api="openbd"
@@ -43,9 +49,10 @@ elif [ -n "${args}" ] ; then
 	
 fi
 
-set -ue
 # ====== 変数の設定ここまで ======
 
+
+# ====== 関数の設定 ======
 # APIから書籍情報を取得する関数
 fetch_data() {
 
@@ -73,96 +80,139 @@ fetch_data() {
 
 }
 
+# openBDから書籍情報を取得する関数
+fetch_openbd() {
+    isbn_val="${1}"
+    url="https://api.openbd.jp/v1/get?isbn=${isbn_val}&pretty"
 
-# openBDから書籍情報を取得
-if [ "${api}" = "openbd" ] ; then
-
-	url="https://api.openbd.jp/v1/get?isbn=${isbn}&pretty"
-
-	fetch_data "${url}" |
+    fetch_data "${url}" |
 
 	# isbn,タイトル,出版社,発売日,著者を抽出
-	grep -F -e "isbn" -e "title" -e "publisher" -e "pubdate" -e "author" |
+    grep -F -e "isbn" -e "title" -e "publisher" -e "pubdate" -e "author" |
 
 	# 区切り文字をダブルクォートに指定
-	awk -F "\"" '
+    awk -F "\"" '
 
 	# 最終行以外を出力
-	NR < 5{
+    NR < 5{
 
-		print $4 
-		
-	}
+        print $4 
 
-	END{
+    }
+
+    END{
 
 		# カンマを削除
-		gsub("," , "" , $4)
+        gsub("," , "" , $4)
 
 		# "西暦-ダブルクォート"の部分を削除
-		gsub(/[0-9][0-9][0-9][0-9]-/ , "" , $4)
-		
+        gsub(/[0-9][0-9][0-9][0-9]-/ , "" , $4)
+
 		# "西暦-西暦ダブルクォート"の部分を削除
-		gsub(/[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]/ , "" , $4)
+        gsub(/[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]/ , "" , $4)
 
 		# "末尾が西暦とダブルクォート"の部分を削除
-		gsub(/[0-9][0-9][0-9][0-9]"$/ , "" , $4)
-		
-		print $4
-		
-	}
-	' |
+        gsub(/[0-9][0-9][0-9][0-9]"$/ , "" , $4)
+
+        print $4
+
+    }
+    ' |
 
 	# 区切り文字をカンマに指定,列を行に置換
-	paste -s -d ',' - |
+    paste -s -d ',' - |
 
 	# 空行を削除
-	sed '/^$/d'
+    sed '/^$/d'
 
-# 国立国会図書館から書籍情報を取得
-elif [ "${api}" = "ndl" ] ; then
+}
 
-	url="https://iss.ndl.go.jp/api/sru?operation=searchRetrieve&version=1.2&recordSchema=dcndl&onlyBib=true&recordPacking=xml&query=isbn=${isbn}%20AND%20dpid=iss-ndl-opac"
+# 国立国会図書館から書籍情報を取得する関数
+fetch_ndl() {
 
-	fetch_data "${url}" |
+    isbn_val="${1}"
+    url="https://iss.ndl.go.jp/api/sru?operation=searchRetrieve&version=1.2&recordSchema=dcndl&onlyBib=true&recordPacking=xml&query=isbn=${isbn_val}%20AND%20dpid=iss-ndl-opac"
 
-	# xmlを整形
-	parsrx.sh |
+    fetch_data "${url}" |
 
-	# isbn,タイトル,出版社,発売日,著者を抽出
-	grep -F -e "BibResource/dcterms:title" -e "BibResource/dc:creator" -e "BibResource/dcterms:publisher/foaf:Agent/foaf:name" -e "BibResource/dcterms:date" |
+    parsrx.sh |
 
-	# 区切り文字にスペースを指定,2フィールド目以降を抽出
-	cut -d" " -f2- |
+    grep -F -e "BibResource/dcterms:title" -e "BibResource/dc:creator" -e "BibResource/dcterms:publisher/foaf:Agent/foaf:name" -e "BibResource/dcterms:date" |
 
-	# 区切り文字をカンマに指定,列を行に置換
-	paste -s -d ',' - |
+    cut -d" " -f2- |
 
-	# 区切り文字にカンマを指定,awk変数isbnにシェル変数を代入
-	awk -F, -v isbn="${isbn}" '
+    paste -s -d ',' - |
 
-	BEGIN{
+    awk -F, -v isbn="${isbn_val}" '
 
-		# 出力時の区切り文字をカンマに指定
-		OFS = ","
+    BEGIN{
 
-	}
+        OFS = ","
 
-	{
-		
-		# 5フィールド目があれば真
-		if($5 != ""){
+    }
+
+    {
+
+		# "末尾が西暦とダブルクォート"の部分を削除
+        if($5 != ""){
 
 			# 海外本の翻訳者への対応
-			print isbn, $1, $4, $5, $2 " " $3
+            print isbn, $1, $4, $5, $2 " " $3
 
-		}else{
+        }else{
 
-			print isbn, $1, $3, $4, $2
+            print isbn, $1, $3, $4, $2
 
-		}
+        }
 
-	}
-	'
+    }
+    '
+}
+# ====== 関数の設定ここまで ======
+
+
+# ====== メイン処理 ======
+# 使用するAPIがopenBDの場合
+if [ "${api}" = "openbd" ] ; then
+
+	# openBDから書籍情報を取得
+    result=$(fetch_openbd "${isbn}")
+
+	# 結果が空の場合
+    if [ -z "${result}" ] ; then
+
+		# 国立国会図書館から書籍情報を取得
+        result=$(fetch_ndl "${isbn}")
+
+    fi
+
+
+# 使用するAPIが国立国会図書館の場合
+elif [ "${api}" = "ndl" ] ; then
+
+	# 国立国会図書館から書籍情報を取得
+    result=$(fetch_ndl "${isbn}")
+
+    if [ -z "${result}" ] ; then
+
+		# openBDから書籍情報を取得
+        result=$(fetch_openbd "${isbn}")
+
+    fi
+
+fi
+
+# "result"が空の場合
+if [ -z "${result}" ] ; then
+
+	# エラーメッセージを出力
+    echo "No data found for ISBN: ${isbn}" 1>&2
+    exit 1
+
+else
+
+	# 結果を出力
+    echo "${result}"
+
 fi
 
