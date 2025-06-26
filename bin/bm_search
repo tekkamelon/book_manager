@@ -1,0 +1,168 @@
+#!/bin/sh
+
+# ====== 変数の設定 ======
+# 環境変数の設定
+export LC_ALL=C
+export LANG=C
+
+# GNU coreutilsの挙動をPOSIXに準拠
+export POSIXLY_CORRECT=1
+
+# デフォルトのAPIを設定
+api="openbd"
+
+# 引数を評価
+case "${1}" in
+
+	"-n")
+
+		api="ndl"
+		shift
+
+		;;
+
+	"-o")
+
+		api="openbd"
+		shift
+
+		;;
+
+esac
+	
+args="${*}"
+
+if [ -p /dev/stdin ] ; then
+
+	# 真の場合は標準入力を変数に代入,非対話的に処理
+	isbn=$(cat - )
+
+elif [ -n "${args}" ] ; then
+
+	isbn="${args}"
+	
+fi
+
+set -ue
+# ====== 変数の設定ここまで ======
+
+# APIから書籍情報を取得する関数
+fetch_data() {
+
+	url="${1}"
+
+	# wgetがシステム内に存在するかを確認
+	if type wget > /dev/null 2>&1 ; then
+
+		# wgetでapiを叩く
+		wget -q -O - "${url}"
+
+	# curlがシステム内に存在するかを確認
+	elif type curl > /dev/null 2>&1 ; then
+		
+		# curlでapiを叩く
+		curl -L -s "${url}"
+
+	else
+
+		# wgetもcurlもない場合はメッセージを表示
+		echo 'please install "wget" or "curl"' 1>&2
+		exit 1
+
+	fi
+
+}
+
+
+# openBDから書籍情報を取得
+if [ "${api}" = "openbd" ] ; then
+
+	url="https://api.openbd.jp/v1/get?isbn=${isbn}&pretty"
+
+	fetch_data "${url}" |
+
+	# isbn,タイトル,出版社,発売日,著者を抽出
+	grep -F -e "isbn" -e "title" -e "publisher" -e "pubdate" -e "author" |
+
+	# 区切り文字をダブルクォートに指定
+	awk -F "\"" '
+
+	# 最終行以外を出力
+	NR < 5{
+
+		print $4 
+		
+	}
+
+	END{
+
+		# カンマを削除
+		gsub("," , "" , $4)
+
+		# "西暦-ダブルクォート"の部分を削除
+		gsub(/[0-9][0-9][0-9][0-9]-/ , "" , $4)
+		
+		# "西暦-西暦ダブルクォート"の部分を削除
+		gsub(/[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]/ , "" , $4)
+
+		# "末尾が西暦とダブルクォート"の部分を削除
+		gsub(/[0-9][0-9][0-9][0-9]"$/ , "" , $4)
+		
+		print $4
+		
+	}
+	' |
+
+	# 区切り文字をカンマに指定,列を行に置換
+	paste -s -d ',' - |
+
+	# 空行を削除
+	sed '/^$/d'
+
+# 国立国会図書館から書籍情報を取得
+elif [ "${api}" = "ndl" ] ; then
+
+	url="https://iss.ndl.go.jp/api/sru?operation=searchRetrieve&version=1.2&recordSchema=dcndl&onlyBib=true&recordPacking=xml&query=isbn=${isbn}%20AND%20dpid=iss-ndl-opac"
+
+	fetch_data "${url}" |
+
+	# xmlを整形
+	parsrx.sh |
+
+	# isbn,タイトル,出版社,発売日,著者を抽出
+	grep -F -e "BibResource/dcterms:title" -e "BibResource/dc:creator" -e "BibResource/dcterms:publisher/foaf:Agent/foaf:name" -e "BibResource/dcterms:date" |
+
+	# 区切り文字にスペースを指定,2フィールド目以降を抽出
+	cut -d" " -f2- |
+
+	# 区切り文字をカンマに指定,列を行に置換
+	paste -s -d ',' - |
+
+	# 区切り文字にカンマを指定,awk変数isbnにシェル変数を代入
+	awk -F, -v isbn="${isbn}" '
+
+	BEGIN{
+
+		# 出力時の区切り文字をカンマに指定
+		OFS = ","
+
+	}
+
+	{
+		
+		# 5フィールド目があれば真
+		if($5 != ""){
+
+			# 海外本の翻訳者への対応
+			print isbn, $1, $4, $5, $2 " " $3
+
+		}else{
+
+			print isbn, $1, $3, $4, $2
+
+		}
+
+	}
+	'
+fi
+
