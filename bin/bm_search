@@ -13,39 +13,73 @@ set -e
 # デフォルトの変数を設定
 api="openbd"
 result=""
+isbn_arg=""
 
-# 引数を評価
-case "${1}" in
+# 引数を解析してオプションとISBNを特定
+while [ "${#}" -gt 0 ]; do
 
-	# -n オプションを指定した場合は国立国会図書館を使用
-	"-n")
+    case "${1}" in
 
-		api="ndl"
-		shift
+		# openBD
+        -o)
 
-		;;
-	
-	# -o オプションを指定した場合はopenBDを使用
-	"-o")
+            api="openbd"
+            shift
+            ;;
 
-		api="openbd"
-		shift
+		# 国立国会図書館
+        -n)
 
-		;;
+            api="ndl"
+            shift
+            ;;
 
-esac
-	
-args="${*}"
+		# 未知のオプション
+        -*)
 
+            echo "Unknown option: $1" 1>&2
+            exit 1
+            ;;
+
+        *)
+
+            # ISBN引数
+            if [ -z "${isbn_arg}" ]; then
+
+                isbn_arg="${1}"
+
+            else
+
+                # 複数のISBNが指定された場合
+                echo "Error: Multiple ISBNs provided." 1>&2
+                exit 1
+				
+            fi
+
+            shift
+            ;;
+
+    esac
+
+done
+
+# ISBNの入力を確認
 if [ -p /dev/stdin ] ; then
 
-	# 真の場合は標準入力を変数に代入,非対話的に処理
+	# パイプから標準入力をISBNとして使用
 	isbn=$(cat - )
 
-elif [ -n "${args}" ] ; then
+elif [ -n "${isbn_arg}" ] ; then
 
-	isbn="${args}"
-	
+	# コマンドライン引数でISBNが指定されている場合
+	isbn="${isbn_arg}"
+
+else
+
+    # ISBNが指定されていない場合
+    echo "Error: ISBN not provided." 1>&2
+    exit 1
+
 fi
 
 set -u
@@ -86,7 +120,7 @@ fetch_openbd() {
     isbn_val="${1}"
     url="https://api.openbd.jp/v1/get?isbn=${isbn_val}&pretty"
 
-    fetch_data "${url}" |
+    fetch_data "${url}" | 
 
 	# isbn,タイトル,出版社,発売日,著者を抽出
     grep -F -e "isbn" -e "title" -e "publisher" -e "pubdate" -e "author" |
@@ -167,6 +201,7 @@ fetch_ndl() {
                 print isbn, $1, $3, $4, $2
 
             }
+
         }
 
     }
@@ -219,4 +254,5 @@ else
     echo "${result}"
 
 fi
+# ====== メイン処理ここまで ======
 
