@@ -8,7 +8,6 @@ export LANG=C
 # GNU coreutilsの挙動をPOSIXに準拠
 export POSIXLY_CORRECT=1
 
-set -u
 set -e
 
 # デフォルトの変数を設定
@@ -49,6 +48,7 @@ elif [ -n "${args}" ] ; then
 	
 fi
 
+set -u
 # ====== 変数の設定ここまで ======
 
 
@@ -82,6 +82,7 @@ fetch_data() {
 
 # openBDから書籍情報を取得する関数
 fetch_openbd() {
+
     isbn_val="${1}"
     url="https://api.openbd.jp/v1/get?isbn=${isbn_val}&pretty"
 
