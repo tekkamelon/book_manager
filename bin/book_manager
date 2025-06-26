@@ -47,7 +47,7 @@ do
 				echo ""
 			
 				# apiを叩く
-				echo "${isbn}" | bm_core |
+				echo "${isbn}" | bm_search |
 
 				# 指定ファイルに追記,指定されてない場合は/dev/nullへ
 				tee -a "${file}"
