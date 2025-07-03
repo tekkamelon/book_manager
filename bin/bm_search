@@ -70,7 +70,7 @@ done
 if [ -p /dev/stdin ] ; then
 
 	# パイプから標準入力をISBNとして使用
-	isbn=$(cat - )
+	isbn="$(cat - )"
 
 elif [ -n "${isbn_arg}" ] ; then
 
@@ -90,7 +90,7 @@ set -u
 
 
 # ====== 関数の設定 ======
-# APIから書籍情報を取得する関数
+# wgetやcurlの有無を確認してapiを叩く関数
 fetch_data() {
 
 	url="${1}"
@@ -232,22 +232,25 @@ esac
 # 結果が空かつフォールバックが有効な場合
 if [ -z "${result}" ] && [ "${fallback_enabled}" -eq 1 ]; then
 
+	# フォールバック処理を実行
     case "${api}" in
 
+		# APIを切り替え,変数に代入
         openbd)
-            result=$(fetch_ndl "${isbn}")
+            result="$(fetch_ndl "${isbn}")"
             ;;
 
         ndl)
-            result=$(fetch_openbd "${isbn}")
+            result="$(fetch_openbd "${isbn}")"
             ;;
 
     esac
-fi
 
+	# 結果を出力
+    echo "${result}"
 
 # "result"が空の場合
-if [ -z "${result}" ] ; then
+elif [ -z "${result}" ]; then
 
 	# エラーメッセージを出力
     echo "No data found for ISBN: ${isbn}" 1>&2
