@@ -36,7 +36,7 @@ do
 
 	# ループで実行される処理の始まり
 	# 入力が初期値若しくは"Q"以外の場合に真,それ以外で偽
-	if [ "${isbn}" = "not_input" ] || [ "${isbn}" != "Q" ] ; then
+	if [ "${isbn}" = "not_input" ] || [ "${isbn}" != "Q" ]; then
 		
 		# プロンプトを表示して入力を読み取る 
 		printf 'please enter ISBN > ' && read -r isbn
@@ -46,8 +46,8 @@ do
 
 				echo ""
 			
-				# apiを叩く
-				echo "${isbn}" | bm_search |
+				# bm_searchをフォールバック処理を有効化し実行
+				echo "${isbn}" | bm_search -f |
 
 				# 指定ファイルに追記,指定されてない場合は/dev/nullへ
 				tee -a "${file}"
