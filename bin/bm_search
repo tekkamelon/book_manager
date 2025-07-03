@@ -23,35 +23,30 @@ while [ "${#}" -gt 0 ]; do
 
 		# openBD
         -o)
-
             api="openbd"
             shift
             ;;
 
 		# 国立国会図書館
         -n)
-
             api="ndl"
             shift
             ;;
 
 		# フォールバック
 		-f)
-
 			fallback_enabled=1
 			shift
 			;;
 
 		# 未知のオプション
         -*)
-
             echo "Unknown option: $1" 1>&2
             exit 1
             ;;
 
+		# ISBN引数
         *)
-
-            # ISBN引数
             if [ -z "${isbn_arg}" ]; then
 
                 isbn_arg="${1}"
@@ -219,33 +214,6 @@ fetch_ndl() {
 
 
 # ====== メイン処理 ======
-# 使用するAPIに応じて書籍情報を取得
-# if [ "${api}" = "openbd" ]; then
-
-#     result=$(fetch_openbd "${isbn}")
-
-# 	# 結果が空かつフォールバックが有効な場合
-#     if [ -z "${result}" ] && [ "${fallback_enabled}" -eq 1 ]; then
-
-# 		# 国立国会図書館から書籍情報を取得
-#         result=$(fetch_ndl "${isbn}")
-
-#     fi
-
-# elif [ "${api}" = "ndl" ]; then
-
-#     result=$(fetch_ndl "${isbn}")
-
-# 	# 結果が空かつフォールバックが有効な場合
-#     if [ -z "${result}" ] && [ "${fallback_enabled}" -eq 1 ]; then
-
-# 		# openBDから書籍情報を取得
-#         result=$(fetch_openbd "${isbn}")
-
-#     fi
-
-# fi
-
 # 使用するAPIに応じて書籍情報を取得,変数に代入
 case "${api}" in
 
@@ -267,12 +235,10 @@ if [ -z "${result}" ] && [ "${fallback_enabled}" -eq 1 ]; then
     case "${api}" in
 
         openbd)
-
             result=$(fetch_ndl "${isbn}")
             ;;
 
         ndl)
-
             result=$(fetch_openbd "${isbn}")
             ;;
 
