@@ -46,7 +46,7 @@ while [ "${#}" -gt 0 ]; do
             ;;
 
 		# ISBN引数
-        *)
+        [0-9]*)
             if [ -z "${isbn_arg}" ]; then
 
                 isbn_arg="${1}"
