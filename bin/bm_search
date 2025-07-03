@@ -220,31 +220,65 @@ fetch_ndl() {
 
 # ====== メイン処理 ======
 # 使用するAPIに応じて書籍情報を取得
-if [ "${api}" = "openbd" ]; then
+# if [ "${api}" = "openbd" ]; then
 
-    result=$(fetch_openbd "${isbn}")
+#     result=$(fetch_openbd "${isbn}")
 
-	# 結果が空かつフォールバックが有効な場合
-    if [ -z "${result}" ] && [ "${fallback_enabled}" -eq 1 ]; then
+# 	# 結果が空かつフォールバックが有効な場合
+#     if [ -z "${result}" ] && [ "${fallback_enabled}" -eq 1 ]; then
 
-		# 国立国会図書館から書籍情報を取得
-        result=$(fetch_ndl "${isbn}")
+# 		# 国立国会図書館から書籍情報を取得
+#         result=$(fetch_ndl "${isbn}")
 
-    fi
+#     fi
 
-elif [ "${api}" = "ndl" ]; then
+# elif [ "${api}" = "ndl" ]; then
 
-    result=$(fetch_ndl "${isbn}")
+#     result=$(fetch_ndl "${isbn}")
 
-	# 結果が空かつフォールバックが有効な場合
-    if [ -z "${result}" ] && [ "${fallback_enabled}" -eq 1 ]; then
+# 	# 結果が空かつフォールバックが有効な場合
+#     if [ -z "${result}" ] && [ "${fallback_enabled}" -eq 1 ]; then
 
-		# openBDから書籍情報を取得
+# 		# openBDから書籍情報を取得
+#         result=$(fetch_openbd "${isbn}")
+
+#     fi
+
+# fi
+
+# 使用するAPIに応じて書籍情報を取得,変数に代入
+case "${api}" in
+
+    openbd)
+
         result=$(fetch_openbd "${isbn}")
+        ;;
 
-    fi
+    ndl)
 
+        result=$(fetch_ndl "${isbn}")
+        ;;
+
+esac
+
+# 結果が空かつフォールバックが有効な場合
+if [ -z "${result}" ] && [ "${fallback_enabled}" -eq 1 ]; then
+
+    case "${api}" in
+
+        openbd)
+
+            result=$(fetch_ndl "${isbn}")
+            ;;
+
+        ndl)
+
+            result=$(fetch_openbd "${isbn}")
+            ;;
+
+    esac
 fi
+
 
 # "result"が空の場合
 if [ -z "${result}" ] ; then
