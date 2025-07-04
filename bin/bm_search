@@ -96,13 +96,13 @@ fetch_data() {
 	url="${1}"
 
 	# wgetがシステム内に存在するかを確認
-	if type wget > /dev/null 2>&1 ; then
+	if command -v wget > /dev/null 2>&1 ; then
 
 		# wgetでapiを叩く
 		wget -q -O - "${url}"
 
 	# curlがシステム内に存在するかを確認
-	elif type curl > /dev/null 2>&1 ; then
+	elif command -v curl > /dev/null 2>&1 ; then
 		
 		# curlでapiを叩く
 		curl -L -s "${url}"
@@ -218,13 +218,11 @@ fetch_ndl() {
 case "${api}" in
 
     openbd)
-
-        result=$(fetch_openbd "${isbn}")
+        result="$(fetch_openbd "${isbn}")"
         ;;
 
     ndl)
-
-        result=$(fetch_ndl "${isbn}")
+        result="$(fetch_ndl "${isbn}")"
         ;;
 
 esac
