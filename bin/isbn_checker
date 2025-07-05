@@ -4,22 +4,28 @@ BEGIN{
 
 	# 1文字ずつフィールドに分割
 	FS = ""
+    odd_num = 0
+    even_num = 0
 
 }
 
 {
 
 	# カウンタ用変数iを1から13まで2づつ増やす
-	for(i = 1; i <= 13; i += 2)
+	for(i = 1; i <= 13; i += 2) {
 
-		# 各フィールドを足しodd_numに代入
-		odd_num += $i
+		# 奇数であれば真
+        if (i % 2 == 1) {
 
-	# カウンタ用変数iを2から12まで2づつ増やす
-	for(i = 2; i <= 12; i += 2)
+            odd_num += $i
 
-		# 各フィールドを足しeven_numに代入
-		even_num += $i
+        }else{
+
+            even_num += $i
+
+        }
+
+	}
 
 	# 奇数桁と偶数桁の3倍を合計
 	addition = odd_num + even_num * 3
