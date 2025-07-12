@@ -99,18 +99,26 @@ fetch_data() {
 	if command -v wget > /dev/null 2>&1 ; then
 
 		# wgetでapiを叩く
-		wget -q -O - "${url}"
+		wget -q -O - "${url}" || 
+
+		# wgetに失敗した場合はエラーメッセージを表示
+		echo 'Error: wget failed' 1>&2
+		exit 1
 
 	# curlがシステム内に存在するかを確認
 	elif command -v curl > /dev/null 2>&1 ; then
 		
 		# curlでapiを叩く
-		curl -L -s "${url}"
+		curl -L -s "${url}" ||
+
+		# curlに失敗した場合はエラーメッセージを表示
+		echo 'Error: curl failed' 1>&2
+		exit 1
 
 	else
 
 		# wgetもcurlもない場合はメッセージを表示
-		echo 'please install "wget" or "curl"' 1>&2
+		echo 'Error: please install "wget" or "curl"' 1>&2
 		exit 1
 
 	fi
@@ -251,7 +259,7 @@ if [ -z "${result}" ] && [ "${fallback_enabled}" -eq 1 ]; then
 elif [ -z "${result}" ]; then
 
 	# エラーメッセージを出力
-    echo "No data found for ISBN: ${isbn}" 1>&2
+    echo "Error: No data found for ISBN: ${isbn}" 1>&2
     exit 1
 
 else
