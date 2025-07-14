@@ -252,11 +252,10 @@ if [ -z "${result}" ] && [ "${fallback_enabled}" -eq 1 ]; then
 
     esac
 
-	# 結果を出力
-    echo "${result}"
+fi
 
 # "result"が空の場合
-elif [ -z "${result}" ]; then
+if [ -z "${result}" ]; then
 
 	# エラーメッセージを出力
     echo "Error: No data found for ISBN: ${isbn}" 1>&2
