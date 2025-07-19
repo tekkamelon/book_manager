@@ -54,7 +54,7 @@ while [ "${#}" -gt 0 ]; do
             else
 
                 # 複数のISBNが指定された場合
-                echo "Error: Multiple ISBNs provided." 1>&2
+                echo "Error: Multiple ISBNs provided" 1>&2
                 exit 1
 
             fi
@@ -80,8 +80,7 @@ elif [ -n "${isbn_arg}" ] ; then
 else
 
     # ISBNが指定されていない場合
-    echo "Error: ISBN not provided." 1>&2
-    exit 1
+    echo "Error: ISBN not provided" 1>&2
 
 fi
 
@@ -102,7 +101,7 @@ fetch_data() {
 		if ! wget -q -O - "${url}"; then
 
 			# wgetに失敗した場合はエラーメッセージを表示
-			echo 'Error: wget failed' 1>&2
+			echo "Error: wget failed" 1>&2
 			exit 1
 
 		fi
@@ -112,9 +111,11 @@ fetch_data() {
 		
 		# curlでapiを叩く
 		if ! curl -L -s "${url}"; then
+
 			# curlに失敗した場合はエラーメッセージを表示
-			echo 'Error: curl failed' 1>&2
+			echo "Error: curl failed" 1>&2
 			exit 1
+
 		fi
 
 	else
@@ -237,22 +238,22 @@ case "${api}" in
 
 esac
 
-# 結果が空かつフォールバックが有効な場合
-if [ -z "${result}" ] && [ "${fallback_enabled}" -eq 1 ]; then
+# 結果が空かつフォールバックが有効な場合 
+if [ -z "${result}" ] && [ "${fallback_enabled}" -eq 1 ]; then 
 
 	# フォールバック処理を実行
-    case "${api}" in
+	case "${api}" in
 
 		# APIを切り替え,変数に代入
-        openbd)
-            result="$(fetch_ndl "${isbn}")"
-            ;;
+		openbd)
+			result="$(fetch_ndl "${isbn}")"
+			;;
 
-        ndl)
-            result="$(fetch_openbd "${isbn}")"
-            ;;
+		ndl)
+			result="$(fetch_openbd "${isbn}")"
+			;;
 
-    esac
+	esac
 
 fi
 
