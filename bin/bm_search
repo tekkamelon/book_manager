@@ -56,7 +56,7 @@ while [ "${#}" -gt 0 ]; do
                 # 複数のISBNが指定された場合
                 echo "Error: Multiple ISBNs provided." 1>&2
                 exit 1
-				
+
             fi
 
             shift
@@ -99,21 +99,23 @@ fetch_data() {
 	if command -v wget > /dev/null 2>&1 ; then
 
 		# wgetでapiを叩く
-		wget -q -O - "${url}" || 
+		if ! wget -q -O - "${url}"; then
 
-		# wgetに失敗した場合はエラーメッセージを表示
-		echo 'Error: wget failed' 1>&2
-		exit 1
+			# wgetに失敗した場合はエラーメッセージを表示
+			echo 'Error: wget failed' 1>&2
+			exit 1
+
+		fi
 
 	# curlがシステム内に存在するかを確認
 	elif command -v curl > /dev/null 2>&1 ; then
 		
 		# curlでapiを叩く
-		curl -L -s "${url}" ||
-
-		# curlに失敗した場合はエラーメッセージを表示
-		echo 'Error: curl failed' 1>&2
-		exit 1
+		if ! curl -L -s "${url}"; then
+			# curlに失敗した場合はエラーメッセージを表示
+			echo 'Error: curl failed' 1>&2
+			exit 1
+		fi
 
 	else
 
