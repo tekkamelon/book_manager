@@ -40,6 +40,26 @@ while [ "${#}" -gt 0 ]; do
 			shift
 			;;
 
+
+		# ヘルプを表示
+		-h)
+			cat <<- EOF
+				Usage: bm_search [options] <ISBN>
+
+				Options:
+				  -o        Use openBD (default)
+				  -n        Use National Diet Library (NDL) API
+				  -f        Enable fallback to the other API if no result
+				  -h        Show this help message and exit
+
+				Examples:
+				  bm_search -o 9784839961451
+				  echo 9784839961451 | bm_search -n
+
+			EOF
+			exit 0
+			;;
+
 		# 未知のオプション
         -*)
 			echo "Error: Unknown option: $1" 1>&2
