@@ -15,6 +15,7 @@ api="openbd"
 result=""
 isbn_arg=""
 fallback_enabled=0
+downloader=""
 
 # 引数を解析してオプションとISBNを特定
 while [ "${#}" -gt 0 ]; do
@@ -84,48 +85,53 @@ else
 
 fi
 
+# ダウンローダ検出
+if command -v wget > /dev/null 2>&1 ; then
+
+    downloader="wget"
+
+elif command -v curl > /dev/null 2>&1 ; then
+
+    downloader="curl"
+
+else
+
+    echo 'Error: please install "wget" or "curl"' 1>&2
+    exit 1
+
+fi
+
 set -u
 # ====== 変数の設定ここまで ======
 
 
 # ====== 関数の設定 ======
-# wgetやcurlの有無を確認してapiを叩く関数
+# データを取得する関数
 fetch_data() {
+    url="${1}"
 
-	url="${1}"
+    case "${downloader}" in
 
-	# wgetがシステム内に存在するかを確認
-	if command -v wget > /dev/null 2>&1 ; then
+        wget)
+            if ! wget -q -O - -- "${url}" ; then
+                echo 'Error: wget failed' 1>&2
+                exit 1
+            fi
+            ;;
 
-		# wgetでapiを叩く
-		if ! wget -q -O - "${url}"; then
+        curl)
+            if ! curl -L -s -- "${url}" ; then
+                echo 'Error: curl failed' 1>&2
+                exit 1
+            fi
+            ;;
 
-			# wgetに失敗した場合はエラーメッセージを表示
-			echo "Error: wget failed" 1>&2
-			exit 1
+        *)
+            echo 'Error: downloader available' 1>&2
+            exit 1
+            ;;
 
-		fi
-
-	# curlがシステム内に存在するかを確認
-	elif command -v curl > /dev/null 2>&1 ; then
-		
-		# curlでapiを叩く
-		if ! curl -L -s "${url}"; then
-
-			# curlに失敗した場合はエラーメッセージを表示
-			echo "Error: curl failed" 1>&2
-			exit 1
-
-		fi
-
-	else
-
-		# wgetもcurlもない場合はメッセージを表示
-		echo 'Error: please install "wget" or "curl"' 1>&2
-		exit 1
-
-	fi
-
+    esac
 }
 
 # openBDから書籍情報を取得する関数
