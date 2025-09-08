@@ -30,6 +30,14 @@ set -u
 # ====== 変数の設定ここまで ======
 
 
+# bm_searchの有無を確認
+if ! command -v bm_search > /dev/null; then
+
+    echo "bm_search is not installed or not in PATH."
+    exit 1
+
+fi
+
 # 対話的に処理
 while :
 do
