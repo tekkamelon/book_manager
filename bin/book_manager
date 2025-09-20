@@ -29,7 +29,6 @@ fi
 set -u
 # ====== 変数の設定ここまで ======
 
-
 # bm_searchの有無を確認
 if ! command -v bm_search > /dev/null; then
 
@@ -47,7 +46,8 @@ do
 	if [ "${isbn}" = "not_input" ] || [ "${isbn}" != "Q" ]; then
 		
 		# プロンプトを表示して入力を読み取る 
-		printf 'please enter ISBN > ' && read -r isbn
+		printf 'please enter ISBN > '
+		read -r isbn
 	
 			# 読み取った入力が"Q"以外であれば真
 			if [ "${isbn}" != "Q" ] ; then
@@ -67,9 +67,7 @@ do
 	elif [ "${isbn}" = "Q" ] ; then 
 
 		# whileのループから脱出
-		exit 0	
-
+		exit	
 	fi
 
 done
-
