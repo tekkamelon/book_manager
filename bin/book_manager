@@ -21,8 +21,8 @@ if [ -n "${1}" ] ; then
 
 else 
 
-	# 偽の場合は出力を捨てる
-	file="/dev/null"
+	# 偽の場合は一時ファイルに保存(yyyymmdd_hhmmss)
+	file="/tmp/$(date +%Y%m%d_%H%M%S).csv"
 
 fi
 
