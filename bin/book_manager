@@ -12,7 +12,7 @@ export POSIXLY_CORRECT=1
 isbn="not_input"
 
 set -e
-	
+
 # 引数の有無を確認,あれば真,無ければ偽
 if [ -n "${1}" ] ; then
 
@@ -23,6 +23,8 @@ else
 
 	# 偽の場合は一時ファイルに保存(yyyymmdd_hhmmss)
 	file="/tmp/$(date +%Y%m%d_%H%M%S).csv"
+	# エラーメッセージを出力
+	echo "No file specified, using temporary file: ${file}" >&2
 
 fi
 
