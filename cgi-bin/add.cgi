@@ -17,7 +17,7 @@ printf 'Content-Type: text/html; charset=UTF-8\r\n\r\n'
 isbn=""
 if [ "${REQUEST_METHOD:-GET}" = "POST" ] && [ -n "${CONTENT_LENGTH:-}" ]; then
   postdata=$(dd bs=1 count="${CONTENT_LENGTH}" 2>/dev/null < /dev/stdin || :)
-  isbn=$(printf '%s' "$postdata" | tr '&' '\n' | grep '^isbn=' | cut -d= -f2- | tr '+' ' ' | sed 's/%20/ /g')
+  isbn=$(printf '%s' "$postdata" | tr '&' '\n' | grep '^isbn=' | cut -d'=' -f2- | urldecode)
 fi
 
 cat << EOF
@@ -35,7 +35,7 @@ EOF
 
 if [ -z "$isbn" ]; then
   echo '<p class="result">ISBNを入力してください。</p>'
-elif ! echo "$isbn" | isbn_checker >/dev/null 2>&1; then
+elif ! echo "$isbn" | isbn_checker.py >/dev/null 2>&1; then
   printf '<p class="result">無効なISBN: %s</p>\n' "$(printf '%s' "$isbn" | sed 's/&/\&amp;/g;s/</\</g;s/>/\>/g')"
 else
   # bm_search実行 (フォールバック有効)
