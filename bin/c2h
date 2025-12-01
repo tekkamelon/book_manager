@@ -1,0 +1,63 @@
+#!/bin/awk -f
+
+# 引数として"-v header="を受取可能
+BEGIN{
+
+	# "fs"が空の場合はカンマを区切り文字に指定
+    FS = (fs == "") ? "," : fs
+
+	# 区切り文字をタグに置換
+	OFS = "</td><td>"
+
+	# ヘッダの出力
+	# "header"変数が"no"であれば出力しない
+	if(header != "no"){
+
+		print "<!DOCTYPE html>"
+		print "<html>"
+		print "<head><meta charset=\"UTF-8\"></head>"
+		print "<body>"
+
+	}
+	
+	print "<table border=\"1\">"
+
+}
+
+# 特殊文字のエスケープ処理
+function escape(str) {
+
+    gsub(/&/, "\\&amp;", str)
+	gsub(/"/, "\\&quot;", str)
+	gsub(/'/, "\\&#39;", str)
+
+    return str
+
+}
+
+# ファイル全体の処理
+{
+	# OFSを$0に反映させるためのフィールド操作
+	$1 = $1
+
+	# 行頭,行末にタグの追記
+	print "<tr>"
+	print "<td>"escape($0)"</td>"
+	print "</tr>"
+
+}
+
+END{
+
+	print "</table>"
+
+	# "header"変数が"no"であれば出力しない
+	if(header != "no"){
+
+		print "</body>"
+		print "</html>"
+
+	}
+
+}
+
