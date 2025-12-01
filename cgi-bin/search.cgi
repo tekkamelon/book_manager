@@ -17,7 +17,7 @@ printf 'Content-Type: text/html; charset=UTF-8\r\n\r\n'
 q=""
 if [ "${REQUEST_METHOD:-GET}" = "POST" ] && [ -n "${CONTENT_LENGTH:-}" ]; then
   postdata=$(dd bs=1 count="${CONTENT_LENGTH}" 2>/dev/null < /dev/stdin || :)
-  q=$(printf '%s' "$postdata" | tr '&' '\n' | grep '^q=' | cut -d= -f2- | tr '+' ' ' | sed 's/%20/ /g')
+  q=$(printf '%s' "$postdata" | tr '&' '\n' | grep '^q=' | cut -d= -f2- | urldecode)
 fi
 
 cat << EOF
@@ -30,20 +30,14 @@ cat << EOF
 </head>
 <body>
   <h1>書籍検索結果</h1>
-  <p><a href="html/search.html">検索</a> | <a href="../html/index.html">メニュー</a></p>
+  <p><a href="../html/search.html">検索</a> | <a href="../html/index.html">メニュー</a></p>
 EOF
 
 if [ -n "$q" ]; then
   printf '<p><strong>検索ワード: %s</strong></p>\n' "$(printf '%s' "$q" | sed 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g')"
 
   # grep -F でCSV検索しテーブル出力 (全フィールド固定文字列検索)
-  grep -F "$q" "$CSV_FILE" | tbug |awk -F, '
-    BEGIN { print "<table><thead><tr><th>ISBN</th><th>タイトル</th><th>出版社</th><th>発売日</th><th>著者</th></tr></thead><tbody>" }
-    NF >= 5 {
-      printf "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>", $1, $2, $3, $4, $5
-    }
-    END { print "</tbody></table>" }
-  ' | sed 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g'
+  grep -F "$q" "$CSV_FILE" | c2h -v header=no
 else
   echo '<p class="result">検索ワードを入力してください。</p>'
 fi
