@@ -13,7 +13,6 @@ csv_file="/home/tekkamelon/Documents/github/book_manager/data/library/library.cs
 script_dir="/home/tekkamelon/Documents/github/book_manager"
 export PATH="${script_dir}/bin:${PATH}"
 
-
 # CGI POSTデータからisbn抽出 (dd+tr/cutでPOSIX準拠)
 isbn=""
 
