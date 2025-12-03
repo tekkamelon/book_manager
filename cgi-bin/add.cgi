@@ -56,7 +56,7 @@ else
 
 	else
 
-		# library.csvに追記 (最後の行のみ、CSV形式確認)
+		# library.csvに追記(最後の行のみ,CSV形式確認)
 		last_line=$(echo "${data}" | tail -1)
 
 		if echo "${last_line}" | grep -q '^[^,]*,[^,]*,'; then
@@ -65,20 +65,8 @@ else
 
 			printf '<p class="result">成功: %s を追加しました。</p>\n' "$(printf '%s' "$isbn" | sed 's/&/\&amp;/g;s/</\</g;s/>/\>/g')"
 		  
-			# 追加データをテーブル表示 (CSVパース)
-			echo '<table><thead><tr><th>ISBN</th><th>タイトル</th><th>出版社</th><th>発売日</th><th>著者</th></tr></thead><tbody>'
-
-			echo "${last_line}" | tr ',' '\n' | awk '
-
-				NR==1 { isbn=$0 }
-				NR==2 { title=$0 }
-				NR==3 { publisher=$0 }
-				NR==4 { pubdate=$0 }
-				NR==5 { author=$0; printf "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>", isbn, title, publisher, pubdate, author }
-
-			' | sed 's/&/\&amp;/g;s/</\</g;s/>/\>/g'
-
-			echo '</tbody></table>'
+			# 追加データをテーブル表示
+			echo "${last_line}" | c2h -v header=no
 
 		else
 
