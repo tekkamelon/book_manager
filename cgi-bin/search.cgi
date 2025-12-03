@@ -18,8 +18,15 @@ printf 'Content-Type: text/html; charset=UTF-8\r\n\r\n'
 q=""
 if [ "${REQUEST_METHOD:-GET}" = "POST" ] && [ -n "${CONTENT_LENGTH:-}" ]; then
 
-	postdata=$(dd bs=1 count="${CONTENT_LENGTH}" 2>/dev/null < /dev/stdin || :)
-	q=$(printf '%s' "${postdata}" | tr '&' '\n' | grep '^q=' | cut -d"=" -f2- | urldecode)
+	# POSTを変数に代入
+	cat_post=$(cat)
+
+	# "foo=bar"の"foo","bar"をそれぞれ抽出
+	post_key="${cat_post%\=*}"
+	post_value="${cat_post#"${post_key}"\=}"
+
+	# POSTをデコード
+	q=$(printf '%s' "${post_value}" | urldecode)
 
 fi
 
