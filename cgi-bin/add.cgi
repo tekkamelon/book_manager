@@ -38,7 +38,7 @@ post_proc(){
 
 		echo '<p class="result">ISBNを入力してください。</p>'
 
-	elif ! echo "${isbn}" | isbn_checker.py >/dev/null 2>&1; then
+	elif ! echo "${isbn}" | isbn_checker >/dev/null 2>&1; then
 
 		printf '<p class="result">無効なISBN: %s</p>\n' "$(printf '%s' "${isbn}" | sed 's/&/\&amp;/g;s/</\</g;s/>/\>/g')"
 
