@@ -1,21 +1,23 @@
 #!/bin/sh
 
-# 環境変数設定
+set -eu
+
+# ====== 変数の設定 ======
+# 環境変数の設定
 export LC_ALL=C
 export LANG=C
 export POSIXLY_CORRECT=1
 
-set -eu
-
+# 変数の設定
 # テストのためハードコード
 csv_file="/home/tekkamelon/Documents/github/book_manager/data/library/library.csv"
 script_dir="/home/tekkamelon/Documents/github/book_manager"
 export PATH="${script_dir}/bin:${PATH}"
 
-printf 'Content-Type: text/html; charset=UTF-8\r\n\r\n'
-
 # CGI POSTデータからq抽出 (dd+tr/cutでPOSIX準拠)
 q=""
+
+# POSTリクエストでコンテンツ長がある場合
 if [ "${REQUEST_METHOD:-GET}" = "POST" ] && [ -n "${CONTENT_LENGTH:-}" ]; then
 
 	# POSTを変数に代入
@@ -25,10 +27,37 @@ if [ "${REQUEST_METHOD:-GET}" = "POST" ] && [ -n "${CONTENT_LENGTH:-}" ]; then
 	post_key="${cat_post%\=*}"
 	post_value="${cat_post#"${post_key}"\=}"
 
-	# POSTをデコード
+	# POSTをデコード,
 	q=$(printf '%s' "${post_value}" | urldecode)
 
 fi
+# ====== 変数の設定ここまで ======
+
+
+# ===== 関数の設定 ======
+# POSTを処理する関数
+post_proc(){
+
+	if [ -n "${q}" ]; then
+
+		printf '<p><strong>検索ワード: %s</strong></p>\n' "$(printf '%s' "${q}" | sed 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g')"
+
+		# 固定文字列で検索
+		grep -F "${q}" "${csv_file}" | c2h -v header=no
+
+	else
+
+		echo '<p class="result">検索ワードを入力してください。</p>'
+
+	fi
+
+}
+# ===== 関数の設定ここまで ======
+
+
+# ====== HTML ======
+echo "Content-Type: text/html; charset=UTF-8"
+echo ""
 
 cat << EOF
 <!DOCTYPE html>
@@ -41,23 +70,10 @@ cat << EOF
 <body>
 	<h1>書籍検索結果</h1>
 	<p><a href="../html/search.html">検索</a> | <a href="../html/index.html">メニュー</a></p>
-EOF
 
-if [ -n "${q}" ]; then
+	$(post_proc)
 
-	printf '<p><strong>検索ワード: %s</strong></p>\n' "$(printf '%s' "${q}" | sed 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g')"
-
-	# grep -F でCSV検索しテーブル出力 (全フィールド固定文字列検索)
-	grep -F "${q}" "${csv_file}" | c2h -v header=no
-
-else
-
-	echo '<p class="result">検索ワードを入力してください。</p>'
-
-fi
-
-cat << EOF
 	</body>
 </html>
 EOF
-
+# ====== HTMLここまで ======
