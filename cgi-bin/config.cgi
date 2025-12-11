@@ -1,5 +1,3 @@
-
-
 #!/bin/sh
 
 set -eu
@@ -8,6 +6,13 @@ set -eu
 export LC_ALL=C
 export LANG=C
 export POSIXLY_CORRECT=1
+
+# urldecode 関数の定義
+# shellcheck disable=SC3060
+urldecode() {
+    url_encoded="${1//+/ }"
+    printf '%b' "${url_encoded//%/\\x}"
+}
 
 # 設定ファイルのパス
 config_file="/workspace/book_manager/book_manager.conf"
@@ -19,16 +24,18 @@ export PATH="/workspace/book_manager/bin:${PATH}"
 # 設定を保存する関数
 save_config() {
     # POSTデータからパラメータを抽出
-    local csv_file=""
-    local script_dir=""
+    csv_file=""
+    script_dir=""
 
     if [ "${REQUEST_METHOD:-GET}" = "POST" ] && [ -n "${CONTENT_LENGTH:-}" ]; then
         # POSTデータを読み込み
-        local post_data=$(cat)
+        post_data="$(cat)"
 
         # パラメータを抽出
-        csv_file=$(echo "$post_data" | grep -o 'csv_file=[^&]*' | cut -d'=' -f2 | urldecode)
-        script_dir=$(echo "$post_data" | grep -o 'script_dir=[^&]*' | cut -d'=' -f2 | urldecode)
+        raw_csv_file=$(echo "$post_data" | grep -o 'csv_file=[^&]*' | cut -d'=' -f2)
+        csv_file=$(urldecode "$raw_csv_file")
+        raw_script_dir=$(echo "$post_data" | grep -o 'script_dir=[^&]*' | cut -d'=' -f2)
+        script_dir=$(urldecode "$raw_script_dir")
     fi
 
     # 設定ファイルを作成/更新
@@ -56,11 +63,20 @@ EOF
 load_config() {
     if [ -f "$config_file" ]; then
         # 設定ファイルから変数を読み込み
+<<<<<<< HEAD
         . "$config_file"
 
         # 変数をエスケープして表示
         local escaped_csv_file=$(printf '%s' "$csv_file" | sed 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g;s/"/\&quot;/g')
         local escaped_script_dir=$(printf '%s' "$script_dir" | sed 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g;s/"/\&quot;/g')
+=======
+# shellcheck disable=SC1090,SC2153
+        . "$CONFIG_FILE"
+
+        # 変数をエスケープして表示
+        escaped_csv_file=$(printf '%s' "$CSV_FILE" | sed 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g;s/"/\&quot;/g')
+        escaped_script_dir=$(printf '%s' "$SCRIPT_DIR" | sed 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g;s/"/\&quot;/g')
+>>>>>>> b5cd5b5 (feat(config.cgi): POSIX準拠とurldecodeの内部実装)
 
         echo '<div class="result success">現在の設定:</div>'
         echo '<pre>'
