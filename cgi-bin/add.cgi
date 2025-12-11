@@ -2,18 +2,17 @@
 
 set -eu
 
-# ====== 変数の設定 ======
 # 環境変数設定
 export LC_ALL=C
 export LANG=C
 export POSIXLY_CORRECT=1
 
 # 設定ファイルから読み込み
-CONFIG_FILE="/workspace/book_manager/book_manager.conf"
-if [ -f "$CONFIG_FILE" ]; then
-    . "$CONFIG_FILE"
-    csv_file="$CSV_FILE"
-    script_dir="$SCRIPT_DIR"
+config_file="/workspace/book_manager/book_manager.conf"
+if [ -f "$config_file" ]; then
+    . "$config_file"
+    csv_file="$csv_file"
+    script_dir="$script_dir"
 else
     # フォールバック: ハードコードされたデフォルト値
     csv_file="/workspace/book_manager/data/library/library.csv"
@@ -22,7 +21,7 @@ fi
 
 export PATH="${script_dir}/bin:${PATH}"
 
-# CGI POSTデータからisbn抽出 (dd+tr/cutでPOSIX準拠)
+# CGI POSTデータからisbn抽出
 isbn=""
 
 if [ "${REQUEST_METHOD:-GET}" = "POST" ] && [ -n "${CONTENT_LENGTH:-}" ]; then
@@ -37,10 +36,9 @@ if [ "${REQUEST_METHOD:-GET}" = "POST" ] && [ -n "${CONTENT_LENGTH:-}" ]; then
 	isbn=$(printf '%s' "${post_value}")
 
 fi
-# ====== 変数の設定ここまで ======
 
 
-# ===== 関数の設定 ======
+# 関数の設定
 post_proc(){
 
 	if [ -z "${isbn}" ]; then
@@ -84,10 +82,10 @@ post_proc(){
 	fi
 
 }
-# ===== 関数の設定ここまで ======
+# 関数の設定ここまで=
 
 
-# ====== HTML ======
+# HTML
 echo "Content-Type: text/html; charset=UTF-8"
 echo ""
 
@@ -109,5 +107,5 @@ cat << EOF
 	</body>
 </html>
 EOF
-# ====== HTMLここまで ======
+# HTMLここまで
 

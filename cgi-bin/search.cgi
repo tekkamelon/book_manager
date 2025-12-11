@@ -2,18 +2,17 @@
 
 set -eu
 
-# ====== 変数の設定 ======
 # 環境変数の設定
 export LC_ALL=C
 export LANG=C
 export POSIXLY_CORRECT=1
 
 # 設定ファイルから読み込み
-CONFIG_FILE="/workspace/book_manager/book_manager.conf"
-if [ -f "$CONFIG_FILE" ]; then
-    . "$CONFIG_FILE"
-    csv_file="$CSV_FILE"
-    script_dir="$SCRIPT_DIR"
+config_file="/workspace/book_manager/book_manager.conf"
+if [ -f "$config_file" ]; then
+    . "$config_file"
+    csv_file="$csv_file"
+    script_dir="$script_dir"
 else
     # フォールバック: ハードコードされたデフォルト値
     csv_file="/workspace/book_manager/data/library/library.csv"
@@ -22,7 +21,7 @@ fi
 
 export PATH="${script_dir}/bin:${PATH}"
 
-# CGI POSTデータからq抽出 (dd+tr/cutでPOSIX準拠)
+# CGI POSTデータからq抽出
 q=""
 
 # POSTリクエストでコンテンツ長がある場合
@@ -35,14 +34,13 @@ if [ "${REQUEST_METHOD:-GET}" = "POST" ] && [ -n "${CONTENT_LENGTH:-}" ]; then
 	post_key="${cat_post%\=*}"
 	post_value="${cat_post#"${post_key}"\=}"
 
-	# POSTをデコード,
+	# POSTをデコード
 	q=$(printf '%s' "${post_value}" | urldecode)
 
 fi
-# ====== 変数の設定ここまで ======
 
 
-# ===== 関数の設定 ======
+# 関数の設定
 # POSTを処理する関数
 post_proc(){
 
@@ -60,10 +58,10 @@ post_proc(){
 	fi
 
 }
-# ===== 関数の設定ここまで ======
+# 関数の設定ここまで
 
 
-# ====== HTML ======
+# HTML
 echo "Content-Type: text/html; charset=UTF-8"
 echo ""
 
@@ -84,4 +82,4 @@ cat << EOF
 	</body>
 </html>
 EOF
-# ====== HTMLここまで ======
+# HTMLここまで
