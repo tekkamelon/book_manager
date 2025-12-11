@@ -7,18 +7,14 @@ export LC_ALL=C
 export LANG=C
 export POSIXLY_CORRECT=1
 
-# urldecode 関数の定義
-# shellcheck disable=SC3060
-urldecode() {
-    url_encoded="${1//+/ }"
-    printf '%b' "${url_encoded//%/\\x}"
-}
 
-# 設定ファイルのパス
-config_file="/workspace/book_manager/book_manager.conf"
+# プロジェクトルートのパスを設定
+SCRIPT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+config_file="${SCRIPT_ROOT}/book_manager.conf"
+BIN_URDECODE="${SCRIPT_ROOT}/bin/urldecode"
 
 # スクリプトディレクトリをPATHに追加
-export PATH="/workspace/book_manager/bin:${PATH}"
+export PATH="${SCRIPT_ROOT}/bin:${PATH}"
 
 # 関数の設定
 # 設定を保存する関数
@@ -31,11 +27,17 @@ save_config() {
         # POSTデータを読み込み
         post_data="$(cat)"
 
+        # POSTデータをurldecode
+        tmp_post="/tmp/bm_post_$$"
+        tmp_decoded="/tmp/bm_decoded_$$"
+        printf '%s' "$post_data" > "$tmp_post"
+        "${BIN_URDECODE}" "$tmp_post" > "$tmp_decoded"
+        decoded_post="$(cat "$tmp_decoded")"
+        rm -f "$tmp_post" "$tmp_decoded"
+
         # パラメータを抽出
-        raw_csv_file=$(echo "$post_data" | grep -o 'csv_file=[^&]*' | cut -d'=' -f2)
-        csv_file=$(urldecode "$raw_csv_file")
-        raw_script_dir=$(echo "$post_data" | grep -o 'script_dir=[^&]*' | cut -d'=' -f2)
-        script_dir=$(urldecode "$raw_script_dir")
+        csv_file=$(echo "$decoded_post" | grep -o 'csv_file=[^&]*' | cut -d'=' -f2)
+        script_dir=$(echo "$decoded_post" | grep -o 'script_dir=[^&]*' | cut -d'=' -f2)
     fi
 
     # 設定ファイルを作成/更新
@@ -68,12 +70,6 @@ load_config() {
         # 変数をエスケープして表示
         escaped_csv_file=$(printf '%s' "$csv_file" | sed 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g;s/"/\&quot;/g')
         escaped_script_dir=$(printf '%s' "$script_dir" | sed 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g;s/"/\&quot;/g')
-# shellcheck disable=SC1090,SC2153
-        . "$CONFIG_FILE"
-
-        # 変数をエスケープして表示
-        escaped_csv_file=$(printf '%s' "$CSV_FILE" | sed 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g;s/"/\&quot;/g')
-        escaped_script_dir=$(printf '%s' "$SCRIPT_DIR" | sed 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g;s/"/\&quot;/g')
 
         echo '<div class="result success">現在の設定:</div>'
         echo '<pre>'
