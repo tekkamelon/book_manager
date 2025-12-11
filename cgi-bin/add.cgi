@@ -8,9 +8,18 @@ export LC_ALL=C
 export LANG=C
 export POSIXLY_CORRECT=1
 
-# テスト用にハードコード
-csv_file="/home/tekkamelon/Documents/github/book_manager/data/library/library.csv"
-script_dir="/home/tekkamelon/Documents/github/book_manager"
+# 設定ファイルから読み込み
+CONFIG_FILE="/workspace/book_manager/book_manager.conf"
+if [ -f "$CONFIG_FILE" ]; then
+    . "$CONFIG_FILE"
+    csv_file="$CSV_FILE"
+    script_dir="$SCRIPT_DIR"
+else
+    # フォールバック: ハードコードされたデフォルト値
+    csv_file="/workspace/book_manager/data/library/library.csv"
+    script_dir="/workspace/book_manager"
+fi
+
 export PATH="${script_dir}/bin:${PATH}"
 
 # CGI POSTデータからisbn抽出 (dd+tr/cutでPOSIX準拠)

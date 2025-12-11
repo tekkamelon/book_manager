@@ -1,0 +1,81 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>設定 - Book Manager</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .config-form {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+        .error {
+            background-color: #f2dede;
+            color: #a94442;
+        }
+    </style>
+</head>
+<body>
+    <h1>Book Manager 設定</h1>
+    <p><a href="index.html">メニュー</a> | <a href="search.html">検索</a> | <a href="add.html">追加</a></p>
+
+    <div class="config-form">
+        <h2>設定</h2>
+        <form action="../cgi-bin/config.cgi" method="POST">
+            <div class="form-group">
+                <label for="csv_file">CSVファイルパス:</label>
+                <input type="text" id="csv_file" name="csv_file" value="/workspace/book_manager/data/library/library.csv" required>
+            </div>
+
+            <div class="form-group">
+                <label for="script_dir">スクリプトディレクトリ:</label>
+                <input type="text" id="script_dir" name="script_dir" value="/workspace/book_manager" required>
+            </div>
+
+            <button type="submit">設定を保存</button>
+        </form>
+
+        <div id="result" class="result" style="display: none;"></div>
+    </div>
+</body>
+</html>
