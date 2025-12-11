@@ -63,20 +63,17 @@ EOF
 load_config() {
     if [ -f "$config_file" ]; then
         # 設定ファイルから変数を読み込み
-<<<<<<< HEAD
         . "$config_file"
 
         # 変数をエスケープして表示
-        local escaped_csv_file=$(printf '%s' "$csv_file" | sed 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g;s/"/\&quot;/g')
-        local escaped_script_dir=$(printf '%s' "$script_dir" | sed 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g;s/"/\&quot;/g')
-=======
+        escaped_csv_file=$(printf '%s' "$csv_file" | sed 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g;s/"/\&quot;/g')
+        escaped_script_dir=$(printf '%s' "$script_dir" | sed 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g;s/"/\&quot;/g')
 # shellcheck disable=SC1090,SC2153
         . "$CONFIG_FILE"
 
         # 変数をエスケープして表示
         escaped_csv_file=$(printf '%s' "$CSV_FILE" | sed 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g;s/"/\&quot;/g')
         escaped_script_dir=$(printf '%s' "$SCRIPT_DIR" | sed 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g;s/"/\&quot;/g')
->>>>>>> b5cd5b5 (feat(config.cgi): POSIX準拠とurldecodeの内部実装)
 
         echo '<div class="result success">現在の設定:</div>'
         echo '<pre>'
