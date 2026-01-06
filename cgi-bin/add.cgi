@@ -20,19 +20,24 @@ config_file="../book_manager.conf"
 # 独自コマンドにパスを通す
 export PATH="../bin:${PATH}"
 
-# CGI POSTデータからisbn抽出
+# CGI POSTデータからisbnとadd_to_csv抽出
 isbn=""
+add_to_csv="no"
 
 if [ "${REQUEST_METHOD:-GET}" = "POST" ] && [ -n "${CONTENT_LENGTH:-}" ]; then
 
-	# POSTを変数に代入
+	# POSTデータを変数に代入
 	cat_post=$(cat)
 
-	# "foo=bar"の"foo","bar"をそれぞれ抽出
-	post_key="${cat_post%\=*}"
-	post_value="${cat_post#"${post_key}"\=}"
+	# isbnを抽出
+	isbn=$(printf '%s' "${cat_post}" | sed 's/.*isbn=\([^&]*\).*/\1/')
 
-	isbn=$(printf '%s' "${post_value}")
+	# add_to_csvを抽出（デフォルトno）
+	add_to_csv=$(printf '%s' "${cat_post}" | sed -n 's/.*add_to_csv=\([^&]*\).*/\1/p')
+
+	if [ -z "${add_to_csv}" ]; then
+		add_to_csv="no"
+	fi
 
 fi
 
@@ -49,20 +54,26 @@ post_proc(){
 
 	else
 
-		# library.csvに追記(最後の行のみ,CSV形式確認)
 		last_line=$(echo "${data}" | tail -1)
 
 		if echo "${last_line}" | grep -q '^[^,]*,[^,]*,'; then
 
-			echo "${last_line}" >> "${csv_file}"
-			printf '<p class="result">成功: %s を追加しました。</p>\n' "$(printf '%s' "${isbn}" | sed 's/&/\&amp;/g;s/</\</g;s/>/\>/g')"
-		  
-			# 追加データをテーブル表示
+			if [ "${add_to_csv}" = "yes" ]; then
+
+				echo "${last_line}" >> "${csv_file}"
+				printf '<p class="result">成功: %s を追加しました</p>\n' "$(printf '%s' "${isbn}" | sed 's/&/\&amp;/g;s/</\</g;s/>/\>/g')"
+			else
+
+				printf '<p class="result">成功: %s の情報を取得しました(CSV追加なし)</p>\n' "$(printf '%s' "${isbn}" | sed 's/&/\&amp;/g;s/</\</g;s/>/\>/g')"
+
+			fi
+
+			# 取得データをテーブル表示
 			echo "${last_line}" | c2h -v header=no
 
 		else
 
-			echo '<p class="result">無効なデータ形式です。</p>'
+			echo '<p class="result">無効なデータ形式です</p>'
 
 		fi
 
