@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# shellcheck disable=SC1090
+
 set -eu
 
 # 環境変数の設定
@@ -8,18 +10,21 @@ export LANG=C
 export POSIXLY_CORRECT=1
 
 # 設定ファイルから読み込み
-config_file="/workspace/book_manager/book_manager.conf"
-if [ -f "$config_file" ]; then
-    . "$config_file"
-    csv_file="$csv_file"
-    script_dir="$script_dir"
+config_file="../book_manager.conf"
+
+if [ -f "${config_file}" ]; then
+
+    . "${config_file}"
+
 else
+
     # フォールバック: ハードコードされたデフォルト値
     csv_file="/workspace/book_manager/data/library/library.csv"
-    script_dir="/workspace/book_manager"
+
 fi
 
-export PATH="${script_dir}/bin:${PATH}"
+# 独自コマンドにパスを通す
+export PATH="../bin:${PATH}"
 
 # CGI POSTデータからq抽出
 q=""
