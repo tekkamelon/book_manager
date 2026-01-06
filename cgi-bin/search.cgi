@@ -9,25 +9,19 @@ export LC_ALL=C
 export LANG=C
 export POSIXLY_CORRECT=1
 
-# 設定ファイルから読み込み
+csv_file=""
+
+# 設定ファイルのパス
 config_file="../book_manager.conf"
 
-if [ -f "${config_file}" ]; then
-
-    . "${config_file}"
-
-else
-
-    # フォールバック: ハードコードされたデフォルト値
-    csv_file="/workspace/book_manager/data/library/library.csv"
-
-fi
+# 設定ファイルから変数を読み込み
+. ${config_file}
 
 # 独自コマンドにパスを通す
 export PATH="../bin:${PATH}"
 
-# CGI POSTデータからq抽出
-q=""
+# CGI POSTデータからsearch_str抽出
+search_str=""
 
 # POSTリクエストでコンテンツ長がある場合
 if [ "${REQUEST_METHOD:-GET}" = "POST" ] && [ -n "${CONTENT_LENGTH:-}" ]; then
@@ -40,7 +34,7 @@ if [ "${REQUEST_METHOD:-GET}" = "POST" ] && [ -n "${CONTENT_LENGTH:-}" ]; then
 	post_value="${cat_post#"${post_key}"\=}"
 
 	# POSTをデコード
-	q=$(printf '%s' "${post_value}" | urldecode)
+	search_str=$(printf '%s' "${post_value}" | urldecode)
 
 fi
 
@@ -49,12 +43,12 @@ fi
 # POSTを処理する関数
 post_proc(){
 
-	if [ -n "${q}" ]; then
+	if [ -n "${search_str}" ]; then
 
-		printf '<p><strong>検索ワード: %s</strong></p>\n' "$(printf '%s' "${q}" | sed 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g')"
+		printf '<p><strong>検索ワード: %s</strong></p>\n' "$(printf '%s' "${search_str}" | sed 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g')"
 
 		# 固定文字列で検索
-		grep -F "${q}" "${csv_file}" | c2h -v header=no
+		grep -F "${search_str}" "${csv_file}" | c2h -v header=no
 
 	else
 
