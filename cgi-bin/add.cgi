@@ -40,41 +40,29 @@ fi
 # 関数の設定
 post_proc(){
 
-	if [ -z "${isbn}" ]; then
+	# bm_search実行 (フォールバック有効)
+	data=$(echo "${isbn}" | bm_search -f 2>/dev/null || echo "")
 
-		echo '<p class="result">ISBNを入力してください。</p>'
+	if [ -z "${data}" ]; then
 
-	elif ! echo "${isbn}" | isbn_checker >/dev/null 2>&1; then
-
-		printf '<p class="result">無効なISBN: %s</p>\n' "$(printf '%s' "${isbn}" | sed 's/&/\&amp;/g;s/</\</g;s/>/\>/g')"
+		printf '<p class="result">書籍情報が見つかりませんでした: %s</p>\n' "$(printf '%s' "${isbn}" | sed 's/&/\&amp;/g;s/</\</g;s/>/\>/g')"
 
 	else
 
-		# bm_search実行 (フォールバック有効)
-		data=$(echo "${isbn}" | bm_search -f 2>/dev/null || echo "")
+		# library.csvに追記(最後の行のみ,CSV形式確認)
+		last_line=$(echo "${data}" | tail -1)
 
-		if [ -z "${data}" ]; then
+		if echo "${last_line}" | grep -q '^[^,]*,[^,]*,'; then
 
-			printf '<p class="result">書籍情報が見つかりませんでした: %s</p>\n' "$(printf '%s' "${isbn}" | sed 's/&/\&amp;/g;s/</\</g;s/>/\>/g')"
+			echo "${last_line}" >> "${csv_file}"
+			printf '<p class="result">成功: %s を追加しました。</p>\n' "$(printf '%s' "${isbn}" | sed 's/&/\&amp;/g;s/</\</g;s/>/\>/g')"
+		  
+			# 追加データをテーブル表示
+			echo "${last_line}" | c2h -v header=no
 
 		else
 
-			# library.csvに追記(最後の行のみ,CSV形式確認)
-			last_line=$(echo "${data}" | tail -1)
-
-			if echo "${last_line}" | grep -q '^[^,]*,[^,]*,'; then
-
-				echo "${last_line}" >> "${csv_file}"
-				printf '<p class="result">成功: %s を追加しました。</p>\n' "$(printf '%s' "${isbn}" | sed 's/&/\&amp;/g;s/</\</g;s/>/\>/g')"
-			  
-				# 追加データをテーブル表示
-				echo "${last_line}" | c2h -v header=no
-
-			else
-
-				echo '<p class="result">無効なデータ形式です。</p>'
-
-			fi
+			echo '<p class="result">無効なデータ形式です。</p>'
 
 		fi
 
