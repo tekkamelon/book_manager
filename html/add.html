@@ -15,7 +15,11 @@
 			<label>ISBN: <input type="text" name="isbn" required></label>
 		</p>
 		<p>
-			<label><input type="checkbox" name="add_to_csv" value="yes" checked> CSVファイルに追加する</label>
+				CSVファイルに追加する
+			<label class="toggle-switch">
+				<input type="checkbox" name="add_to_csv" value="yes" checked>
+				<span class="toggle-slider"></span>
+			</label>
 		</p>
 		<p>
 			<input type="submit" value="実行">
