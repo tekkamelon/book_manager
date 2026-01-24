@@ -107,7 +107,7 @@ cat << EOF
 </head>
 <body>
     <h1>設定結果</h1>
-    <p><a href="../html/config.html">設定ページ</a> | <a href="../html/index.html">メニュー</a></p>
+    <p><a href="../html/settings.html">設定ページ</a> | <a href="../html/index.html">メニュー</a></p>
 	$(result)
 
 </body>
