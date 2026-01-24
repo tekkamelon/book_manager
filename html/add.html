@@ -9,13 +9,14 @@
 
 <body>
 	<h1>書籍取得と追加</h1>
-	<p><a href="index.html">メニュー</a></p>
+	<p><a href="index.html">トップ</a> | <a href="search.html">検索</a> | <a href="add.html">追加</a></p>
+
 	<form method="POST" action="../cgi-bin/add.cgi">
 		<p>
 			<label>ISBN: <input type="text" name="isbn" required></label>
 		</p>
 		<p>
-				CSVファイルに追加する
+			CSVファイルに追加する
 			<label class="toggle-switch">
 				<input type="checkbox" name="add_to_csv" value="yes" checked>
 				<span class="toggle-slider"></span>
