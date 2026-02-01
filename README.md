@@ -132,6 +132,57 @@ bm_search -f 9784488025552
 
         - ヘルプを出力
 
+### c2h
+```sh
+# CSVデータをパイプで渡す
+cat book.csv | c2h
+
+# ヘッダなしで出力
+cat book.csv | c2h -v header=no
+```
+
+CSVデータをHTMLテーブル形式に変換するAWKスクリプト  
+`header=no`オプションでHTMLのhead,bodyタグを省略可能
+
+## Web UI
+
+ブラウザから蔵書管理ができるWebインターフェース
+
+### 起動方法
+```sh
+# CGIサーバーを起動
+python3 cgi_server.py
+
+# ブラウザでアクセス
+# http://localhost:8000/html/index.html
+```
+
+### ファイル構成
+
+- **cgi_server.py** - Python製の簡易CGIサーバー(ポート8000)
+- **book_manager.conf** - 設定ファイル(CSVファイルパスなど)
+- **template.csv** - CSVファイルのテンプレート
+
+#### HTMLファイル
+- **html/index.html** - メインメニュー画面
+- **html/search.html** - 蔵書検索フォーム
+- **html/add.html** - 書籍追加・データ検索フォーム
+- **html/settings.html** - 設定画面
+
+#### CGIスクリプト
+- **cgi-bin/search.cgi** - 蔵書検索処理
+- **cgi-bin/add.cgi** - 書籍追加処理
+- **cgi-bin/settings.cgi** - 設定保存/読込処理
+
+#### その他
+- **js/settings.js** - 設定値読み込み用JavaScript
+- **css/style.css** - スタイルシート(ライト/ダークモード対応)
+
+### 機能
+- 蔵書検索 - CSVファイル内を検索
+- 書籍追加 - ISBNから書籍情報を取得しCSVに追加
+- 設定変更 - CSVファイルパスの設定
+
 ## 引用元
 
 - urldecode
