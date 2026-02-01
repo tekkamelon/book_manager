@@ -97,7 +97,7 @@ cat << EOF
 </head>
 <body>
 	<h1>書籍追加結果</h1>
-	<p><a href="../html/search.html">検索</a> | <a href="../html/add.html">追加</a> | <a href="../html/index.html">メニュー</a></p>
+	<p><a href="../html/search.html">検索</a> | <a href="../html/add.html">追加</a> | <a href="../html/settings.html">設定</a> | <a href="../html/index.html">メニュー</a></p>
 <!-- EOF -->
 	$(post_proc)
 

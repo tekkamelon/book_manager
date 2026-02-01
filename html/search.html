@@ -16,9 +16,19 @@
 			<label>検索ワード: <input type="search" name="q" required></label>
 		</p>
 		<p>
+			<small id="current_csv_file">対象ファイル: 読み込み中...</small>
+		</p>
+
+		<script src="../js/settings.js"></script>
+		<script>
+			// 設定ファイルからcsv_fileの値を読み込む
+			loadCsvFilePath('current_csv_file', '対象ファイル: ', '設定の読み込みに失敗しました:');
+		</script>
+		<p>
 			<input type="submit" value="検索">
 		</p>
 	</form>
+
 </body>
 
 </html>
