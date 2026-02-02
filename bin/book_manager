@@ -8,7 +8,7 @@ export LANG=C
 # GNU coreutilsの挙動をPOSIXに準拠
 export POSIXLY_CORRECT=1
 
-# デフォルトの変数
+# 変数を初期化
 isbn="not_input"
 
 set -e

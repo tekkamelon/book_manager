@@ -9,7 +9,10 @@ export LC_ALL=C
 export LANG=C
 export POSIXLY_CORRECT=1
 
+# 変数を初期化
 csv_file=""
+isbn=""
+add_to_csv="no"
 
 # 設定ファイルのパス
 config_file="../book_manager.conf"
@@ -19,10 +22,6 @@ config_file="../book_manager.conf"
 
 # 独自コマンドにパスを通す
 export PATH="../bin:${PATH}"
-
-# CGI POSTデータからisbnとadd_to_csv抽出
-isbn=""
-add_to_csv="no"
 
 if [ "${REQUEST_METHOD:-GET}" = "POST" ] && [ -n "${CONTENT_LENGTH:-}" ]; then
 
