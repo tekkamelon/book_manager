@@ -26,6 +26,32 @@ function loadCsvFilePath(elementId, successPrefix, errorMessage) {
 			// エラーが発生した場合の処理
 			console.error(errorMessage, error);
 			document.getElementById(elementId).textContent = `${successPrefix}読み込み失敗`;
+// 設定ファイルからcode-serverの値を読み込む関数
+function loadCodeServerUrl(callback) {
+	fetch('../cgi-bin/settings.cgi')
+		.then(response => response.text())
+		.then(html => {
+			const parser = new DOMParser();
+			const doc = parser.parseFromString(html, 'text/html');
+			const preElement = doc.querySelector('pre');
+
+			if (preElement) {
+				const text = preElement.textContent;
+				// 正規表現でcode-serverの値を抽出
+				const match = text.match(/code-server=([^\\n]+)/);
+				if (match) {
+					const url = match[1].replace(/&quot;/g, '"');
+					callback(url);
+					return;
+				}
+			}
+			callback(null);
+		})
+		.catch(error => {
+			console.error('code-serverの読み込みに失敗しました:', error);
+			callback(null);
+		});
+}
 			return null;
 		});
 }
