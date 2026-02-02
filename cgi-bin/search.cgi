@@ -9,7 +9,10 @@ export LC_ALL=C
 export LANG=C
 export POSIXLY_CORRECT=1
 
+# 変数を初期化
 csv_file=""
+search_str=""
+search_result=""
 
 # 設定ファイルのパス
 config_file="../book_manager.conf"
@@ -19,9 +22,6 @@ config_file="../book_manager.conf"
 
 # 独自コマンドにパスを通す
 export PATH="../bin:${PATH}"
-
-# CGI POSTデータからsearch_str抽出
-search_str=""
 
 # POSTリクエストでコンテンツ長がある場合
 if [ "${REQUEST_METHOD:-GET}" = "POST" ] && [ -n "${CONTENT_LENGTH:-}" ]; then
@@ -43,22 +43,40 @@ fi
 # POSTを処理する関数
 post_proc(){
 
+	set +eu
+
+	# 検索ワードが空でない場合に真
 	if [ -n "${search_str}" ]; then
 
-		printf '<p><strong>検索ワード: %s</strong></p>\n' "$(printf '%s' "${search_str}" | sed 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g')"
+		# 固定文字列,大文字小文字を区別せず検索
+		search_result=$(grep -F -i  "${search_str}" "${csv_file}") 
 
-		# 固定文字列で検索
-		grep -F "${search_str}" "${csv_file}" | c2h -v header=no
+		# 検索結果があれば真
+		if [ -n "${search_result}" ]; then
+
+			# メッセージを表示
+			printf '%s\n' "<p><strong>検索ワード: ${search_str}</strong></p>"
+
+			# 検索結果をHTMLテーブルで表示
+			printf '%s\n' "${search_result}"| c2h -v header=no
+
+		else
+
+			printf '%s\n' "<p><strong>検索ワード: ${search_str}に合致する結果はありません</strong></p>"
+
+		fi
 
 	else
 
-		echo '<p class="result">検索ワードを入力してください。</p>'
+		printf '%s\n' '<p class="result">検索ワードを入力してください。</p>'
 
 	fi
 
 }
 # 関数の設定ここまで
 
+
+set -eu
 
 # HTML
 echo "Content-Type: text/html; charset=UTF-8"
@@ -74,7 +92,7 @@ cat << EOF
 </head>
 <body>
 	<h1>蔵書検索結果</h1>
-	<p><a href="../html/search.html">検索</a> | <a href="../html/add.html">追加</a> | <a href="../html/settings.html">設定</a> | <a href="../html/index.html">メニュー</a></p>
+	<p><a href="../html/index.html">トップ</a> | <a href="../html/search.html">検索</a> | <a href="../html/add.html">追加</a> | <a href="../html/settings.html">設定</a> </p>
 
 	$(post_proc)
 
