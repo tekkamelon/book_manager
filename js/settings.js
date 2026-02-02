@@ -1,15 +1,17 @@
 // 設定ファイルからcsv_fileの値を読み込む共通関数
 function loadCsvFilePath(elementId, successPrefix, errorMessage) {
+	// CGIスクリプトから設定データを取得
 	fetch('../cgi-bin/settings.cgi')
 		.then(response => response.text())
 		.then(html => {
-			// HTMLから現在のcsv_file値を抽出
+			// HTMLをパースして現在のcsv_file値を抽出
 			const parser = new DOMParser();
 			const doc = parser.parseFromString(html, 'text/html');
 			const preElement = doc.querySelector('pre');
 
 			if (preElement) {
 				const text = preElement.textContent;
+				// 正規表現でcsv_fileの値を抽出
 				const match = text.match(/csv_file=([^\n]+)/);
 				if (match) {
 					const currentPath = match[1].replace(/&quot;/g, '"');
@@ -21,6 +23,7 @@ function loadCsvFilePath(elementId, successPrefix, errorMessage) {
 			return null;
 		})
 		.catch(error => {
+			// エラーが発生した場合の処理
 			console.error(errorMessage, error);
 			document.getElementById(elementId).textContent = `${successPrefix}読み込み失敗`;
 			return null;
@@ -39,6 +42,7 @@ function loadCsvFilePathToInput(inputId, labelId) {
 
 			if (preElement) {
 				const text = preElement.textContent;
+				// 正規表現でcsv_fileの値を抽出
 				const match = text.match(/csv_file=([^\n]+)/);
 				if (match) {
 					const currentPath = match[1].replace(/&quot;/g, '"');
@@ -51,6 +55,7 @@ function loadCsvFilePathToInput(inputId, labelId) {
 			return null;
 		})
 		.catch(error => {
+			// エラーが発生した場合の処理
 			console.error('設定の読み込みに失敗しました:', error);
 			document.getElementById(labelId).textContent = '現在の設定: 読み込み失敗';
 			return null;
