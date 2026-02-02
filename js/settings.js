@@ -98,3 +98,33 @@ function loadCsvFilePathToInput(inputId, labelId) {
 			return null;
 		});
 }
+
+// 設定ファイルからcode-serverの値を読み込んでinput要素に設定する関数
+function loadCodeServerUrlToInput(inputId, labelId) {
+	fetch('../cgi-bin/settings.cgi')
+		.then(response => response.text())
+		.then(html => {
+			const parser = new DOMParser();
+			const doc = parser.parseFromString(html, 'text/html');
+			const preElement = doc.querySelector('pre');
+
+			if (preElement) {
+				const text = preElement.textContent;
+				const match = text.match(/code-server=([^\n]+)/);
+				if (match) {
+					let url = match[1].replace(/&quot;/g, '"');
+					url = url.replace(/^"|"$/g, '');
+					document.getElementById(inputId).value = url;
+					document.getElementById(labelId).textContent = `現在の設定: ${url}`;
+					return url;
+				}
+			}
+			document.getElementById(labelId).textContent = '現在の設定: なし';
+			return null;
+		})
+		.catch(error => {
+			console.error('code-serverの読み込みに失敗しました:', error);
+			document.getElementById(labelId).textContent = '現在の設定: 読み込み失敗';
+			return null;
+		});
+}
