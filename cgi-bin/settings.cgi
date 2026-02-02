@@ -21,7 +21,7 @@ save_config() {
 
     # POSTデータからパラメータを抽出
     csv_file=""
-    script_dir=""
+    code_server=""
 
     if [ "${REQUEST_METHOD:-GET}" = "POST" ] && [ -n "${CONTENT_LENGTH:-}" ]; then
         # POSTデータを読み込み
@@ -32,7 +32,7 @@ save_config() {
 
         # パラメータを抽出
         csv_file=$(echo "${decoded_post}" | grep -o 'csv_file=[^&]*' | cut -d'=' -f2)
-        script_dir=$(echo "${decoded_post}" | grep -o 'script_dir=[^&]*' | cut -d'=' -f2)
+        code_server=$(echo "${decoded_post}" | grep -o 'code_server=[^&]*' | cut -d'=' -f2)
     fi
 
     # 設定ファイルを作成/更新
@@ -42,6 +42,9 @@ save_config() {
 
 		# CSV file path
 		csv_file="${csv_file}"
+
+		# code-server URL
+		code-server="${code_server}"
 
 		# Environment variables
 		LC_ALL=C
@@ -59,18 +62,16 @@ load_config() {
 
 	# 設定ファイルの有無を確認
     if [ -f "${config_file}" ]; then
-        # 設定ファイルから変数を読み込み
-        . "${config_file}"
-
-        # 変数をエスケープして表示
-        escaped_csv_file=$(printf '%s' "${csv_file}" | sed 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g;s/"/\&quot;/g')
-        escaped_script_dir=$(printf '%s' "${script_dir}" | sed 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g;s/"/\&quot;/g')
+        # 設定ファイルからcsv_fileの値を抽出
+        escaped_csv_file=$(grep '^csv_file=' "${config_file}" | cut -d'=' -f2- | sed 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g;s/"/\&quot;/g')
+        # 設定ファイルからcode-serverの値を抽出
+        escaped_code_server=$(grep '^code-server=' "${config_file}" | cut -d'=' -f2- | sed 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g;s/"/\&quot;/g')
 
         cat <<- EOF
 			<div class="result success">現在の設定:</div>
 			<pre>
 			csv_file=${escaped_csv_file}
-			script_dir=${escaped_script_dir}
+			code-server=${escaped_code_server}
 			</pre>
 		EOF
 
