@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Help Button</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        #result { margin-top: 20px; padding: 10px; border: 1px solid #ccc; background: #f0f0f0; }
+        #log { margin-top: 20px; padding: 10px; border: 1px solid #ccc; background: #f0f0f0; font-family: monospace; white-space: pre-wrap; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>Test Help Button</h1>
+    <button id="helpButton">ヘルプ</button>
+    <div id="result">待機中...</div>
+    <div id="log">ログがここに表示されます...</div>
+
+    <script>
+    const logDiv = document.getElementById('log');
+    const resultDiv = document.getElementById('result');
+
+    function log(message) {
+        const timestamp = new Date().toLocaleTimeString();
+        logDiv.textContent += `[${timestamp}] ${message}\n`;
+        console.log(message);
+    }
+
+    function loadCodeServerUrl(callback) {
+        log('code-server URLを読み込み開始');
+        fetch('../cgi-bin/settings.cgi')
+            .then(response => {
+                log('CGIレスポンス受信: ' + response.status + ' ' + response.statusText);
+                if (!response.ok) {
+                    throw new Error('HTTP ' + response.status);
+                }
+                return response.text();
+            })
+            .then(html => {
+                log('受信したHTML (先頭200文字): ' + html.substring(0, 200));
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const preElement = doc.querySelector('pre');
+
+                if (preElement) {
+                    const text = preElement.textContent;
+                    log('pre要素の内容:\n' + text);
+                    const match = text.match(/code-server=([^\n]+)/);
+                    if (match) {
+                        const url = match[1].replace(/&quot;/g, '"');
+                        log('抽出したURL: ' + url);
+                        callback(url);
+                        return;
+                    }
+                    log('code-serverが見つかりませんでした');
+                } else {
+                    log('pre要素が見つかりませんでした');
+                }
+                callback(null);
+            })
+            .catch(error => {
+                log('code-serverの読み込みに失敗しました: ' + error.message);
+                console.error('code-serverの読み込みに失敗しました:', error);
+                callback(null);
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        log('ページが読み込まれました');
+        document.getElementById('helpButton').addEventListener('click', function () {
+            log('ヘルプボタンがクリックされました');
+            resultDiv.innerHTML = '読み込み中...';
+            resultDiv.className = '';
+            
+            loadCodeServerUrl(function (url) {
+                log('URL読み込み完了');
+                if (url) {
+                    resultDiv.innerHTML = '<span class="success">URL取得成功: ' + url + '</span>';
+                    resultDiv.className = 'success';
+                    log('URLを新しいタブで開きます: ' + url);
+                    window.open(url, '_blank');
+                } else {
+                    resultDiv.innerHTML = '<span class="error">URLが見つかりません</span>';
+                    resultDiv.className = 'error';
+                    log('URLが見つかりませんでした');
+                    alert('code-serverのURLが設定されておりません');
+                }
+            });
+        });
+    });
+    </script>
+</body>
+</html>
