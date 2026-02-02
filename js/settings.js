@@ -49,7 +49,8 @@ function loadCodeServerUrl(callback) {
 				console.log('pre要素の内容:', text);
 				const match = text.match(/code-server=([^\n]+)/);
 				if (match) {
-					const url = match[1].replace(/&quot;/g, '"');
+					let url = match[1].replace(/&quot;/g, '"');
+					url = url.replace(/^"|"$/g, '');
 					console.log('抽出したURL:', url);
 					callback(url);
 					return;

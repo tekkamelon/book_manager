@@ -13,12 +13,12 @@
 	<p><button onclick="location.href='add.html'">書籍追加・データ検索</button></p>
 	<p><button onclick="location.href='settings.html'">設定</button></p>
 	<!-- 外部リンクのボタン -->
-	<p><button id="helpButton">ヘルプ</button></p>
+	<p><button id="helpButton">編集</button></p>
 	<script src="../js/settings.js"></script>
 	<script>
 		document.addEventListener('DOMContentLoaded', function () {
 			document.getElementById('helpButton').addEventListener('click', function () {
-				console.log('ヘルプボタンがクリックされました');
+				console.log('ボタンがクリックされました');
 				loadCodeServerUrl(function (url) {
 					console.log('URL読み込み完了:', url);
 					if (url) {
