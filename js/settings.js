@@ -26,33 +26,43 @@ function loadCsvFilePath(elementId, successPrefix, errorMessage) {
 			// エラーが発生した場合の処理
 			console.error(errorMessage, error);
 			document.getElementById(elementId).textContent = `${successPrefix}読み込み失敗`;
+			return null;
+		});
+}
+
 // 設定ファイルからcode-serverの値を読み込む関数
 function loadCodeServerUrl(callback) {
+	console.log('code-server URLを読み込み開始');
 	fetch('../cgi-bin/settings.cgi')
-		.then(response => response.text())
+		.then(response => {
+			console.log('CGIレスポンス受信:', response.status);
+			return response.text();
+		})
 		.then(html => {
+			console.log('受信したHTML:', html.substring(0, 200));
 			const parser = new DOMParser();
 			const doc = parser.parseFromString(html, 'text/html');
 			const preElement = doc.querySelector('pre');
 
 			if (preElement) {
 				const text = preElement.textContent;
-				// 正規表現でcode-serverの値を抽出
-				const match = text.match(/code-server=([^\\n]+)/);
+				console.log('pre要素の内容:', text);
+				const match = text.match(/code-server=([^\n]+)/);
 				if (match) {
 					const url = match[1].replace(/&quot;/g, '"');
+					console.log('抽出したURL:', url);
 					callback(url);
 					return;
 				}
+				console.log('code-serverが見つかりませんでした');
+			} else {
+				console.log('pre要素が見つかりませんでした');
 			}
 			callback(null);
 		})
 		.catch(error => {
 			console.error('code-serverの読み込みに失敗しました:', error);
 			callback(null);
-		});
-}
-			return null;
 		});
 }
 
