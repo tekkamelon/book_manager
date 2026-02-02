@@ -20,6 +20,12 @@
 				<small id="current_csv_file">現在の設定: 読み込み中...</small>
 			</div>
 
+			<div class="form-group">
+				<label for="code_server">code-server URL:</label>
+				<input type="text" id="code_server" name="code_server" value="">
+				<small id="current_code_server">現在の設定: 読み込み中...</small>
+			</div>
+
 			<button type="submit">設定を保存</button>
 
 		</form>
@@ -31,6 +37,8 @@
 	<script>
 		// 設定ファイルからcsv_fileの値を読み込む
 		loadCsvFilePathToInput('csv_file', 'current_csv_file');
+		// 設定ファイルからcode-serverの値を読み込む
+		loadCodeServerUrlToInput('code_server', 'current_code_server');
 	</script>
 </body>
 
