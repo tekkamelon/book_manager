@@ -44,7 +44,7 @@ save_config() {
 		csv_file="${csv_file}"
 
 		# code-server URL
-		code-server="${code_server}"
+		code_server="${code_server}"
 
 		# Environment variables
 		LC_ALL=C
@@ -64,14 +64,14 @@ load_config() {
     if [ -f "${config_file}" ]; then
         # 設定ファイルからcsv_fileの値を抽出
         escaped_csv_file=$(grep '^csv_file=' "${config_file}" | cut -d'=' -f2- | sed 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g;s/"/\&quot;/g')
-        # 設定ファイルからcode-serverの値を抽出
-        escaped_code_server=$(grep '^code-server=' "${config_file}" | cut -d'=' -f2- | sed 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g;s/"/\&quot;/g')
+        # 設定ファイルからcode_serverの値を抽出
+        escaped_code_server=$(grep '^code_server=' "${config_file}" | cut -d'=' -f2- | sed 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g;s/"/\&quot;/g')
 
         cat <<- EOF
 			<div class="result success">現在の設定:</div>
 			<pre>
 			csv_file=${escaped_csv_file}
-			code-server=${escaped_code_server}
+			code_server=${escaped_code_server}
 			</pre>
 		EOF
 
