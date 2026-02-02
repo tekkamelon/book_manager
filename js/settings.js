@@ -45,18 +45,18 @@ function loadCodeServerUrl(callback) {
 			const preElement = doc.querySelector('pre');
 
 			if (preElement) {
-				const text = preElement.textContent;
-				console.log('pre要素の内容:', text);
-				const match = text.match(/code-server=([^\n]+)/);
-				if (match) {
-					let url = match[1].replace(/&quot;/g, '"');
-					url = url.replace(/^"|"$/g, '');
-					console.log('抽出したURL:', url);
-					callback(url);
-					return;
-				}
-				console.log('code-serverが見つかりませんでした');
-			} else {
+			const text = preElement.textContent;
+			console.log('pre要素の内容:', text);
+			const match = text.match(/code_server=([^\n]+)/);
+			if (match) {
+				let url = match[1].replace(/&quot;/g, '"');
+				url = url.replace(/^"|"$/g, '');
+				console.log('抽出したURL:', url);
+				callback(url);
+				return;
+			}
+			console.log('code-serverが見つかりませんでした');
+		} else {
 				console.log('pre要素が見つかりませんでした');
 			}
 			callback(null);
@@ -109,16 +109,16 @@ function loadCodeServerUrlToInput(inputId, labelId) {
 			const preElement = doc.querySelector('pre');
 
 			if (preElement) {
-				const text = preElement.textContent;
-				const match = text.match(/code-server=([^\n]+)/);
-				if (match) {
-					let url = match[1].replace(/&quot;/g, '"');
-					url = url.replace(/^"|"$/g, '');
-					document.getElementById(inputId).value = url;
-					document.getElementById(labelId).textContent = `現在の設定: ${url}`;
-					return url;
-				}
+			const text = preElement.textContent;
+			const match = text.match(/code_server=([^\n]+)/);
+			if (match) {
+				let url = match[1].replace(/&quot;/g, '"');
+				url = url.replace(/^"|"$/g, '');
+				document.getElementById(inputId).value = url;
+				document.getElementById(labelId).textContent = `現在の設定: ${url}`;
+				return url;
 			}
+		}
 			document.getElementById(labelId).textContent = '現在の設定: なし';
 			return null;
 		})
