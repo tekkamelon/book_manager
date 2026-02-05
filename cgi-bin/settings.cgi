@@ -45,6 +45,15 @@ save_config() {
         return 1
     fi
 
+    # code-serverの稼働確認
+    if [ -n "${code_server}" ]; then
+        status_code=$(curl -o /dev/null -s -w "%{http_code}" --connect-timeout 5 "${code_server}/healthz" 2>/dev/null || echo "000")
+        if [ "${status_code}" != "200" ]; then
+            echo '<div class="result error">code-serverに接続できません (HTTP ' "${status_code}" '): ' "${code_server}" '</div>'
+            return 1
+        fi
+    fi
+
     # 設定ファイルを作成/更新
     cat > "${config_file}" <<- EOF
 		# Book Manager Configuration
