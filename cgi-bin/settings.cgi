@@ -25,7 +25,7 @@ save_config() {
 
     if [ "${REQUEST_METHOD:-GET}" = "POST" ] && [ -n "${CONTENT_LENGTH:-}" ]; then
         # POSTデータを読み込み
-        post_data="$(cat | tbug)"
+        post_data="$(cat)"
 
         # POSTデータをurldecode
 		decoded_post=$(echo "$post_data" | urldecode)
@@ -34,6 +34,10 @@ save_config() {
         csv_file=$(echo "${decoded_post}" | grep -o 'csv_file=[^&]*' | cut -d'=' -f2)
         code_server=$(echo "${decoded_post}" | grep -o 'code_server=[^&]*' | cut -d'=' -f2)
     fi
+
+    # 値から先頭と末尾のダブルクォートを削除
+    csv_file=$(echo "${csv_file}" | sed 's/^"//;s/"$//')
+    code_server=$(echo "${code_server}" | sed 's/^"//;s/"$//')
 
     # 設定ファイルを作成/更新
     cat > "${config_file}" <<- EOF
