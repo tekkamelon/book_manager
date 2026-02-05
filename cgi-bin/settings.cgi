@@ -39,6 +39,12 @@ save_config() {
     csv_file=$(echo "${csv_file}" | sed 's/^"//;s/"$//')
     code_server=$(echo "${code_server}" | sed 's/^"//;s/"$//')
 
+    # CSVファイルの有無を確認
+    if [ ! -f "${csv_file}" ]; then
+        echo '<div class="result error">CSVファイルが見つかりません: ' "${csv_file}" '</div>'
+        return 1
+    fi
+
     # 設定ファイルを作成/更新
     cat > "${config_file}" <<- EOF
 		# Book Manager Configuration
