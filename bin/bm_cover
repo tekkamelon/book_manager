@@ -1,0 +1,169 @@
+#!/bin/sh
+
+# 環境変数設定
+export LC_ALL=C
+export LANG=C
+export POSIXLY_CORRECT=1
+
+set -eu
+
+# 変数を初期化
+api="openbd"
+fallback_enabled=0
+downloader=""
+
+# ダウンローダ検出
+if command -v wget >/dev/null 2>&1; then
+	downloader="wget"
+elif command -v curl >/dev/null 2>&1; then
+	downloader="curl"
+else
+	echo 'Error: please install "wget" or "curl"' >&2
+	exit 1
+fi
+
+# 引数解析
+isbn=""
+
+# 引数がある場合にループ
+while [ "${#}" -gt 0 ]; do
+
+	# 引数の内容に応じて処理
+	case "${1}" in
+		-o) api="openbd"; shift ;;
+		-g) api="google"; shift ;;
+		-f) fallback_enabled=1; shift ;;
+		-h)
+			cat <<- 'EOF'
+			Usage: bm_cover [options] <ISBN>
+
+			Options:
+			  -o        Use openBD (default)
+			  -g        Use Google Books API
+			  -f        Enable fallback to the other API if no result
+			  -h        Show this help message and exit
+
+			Examples:
+			  bm_cover -o 9784839961451
+			  echo 9784839961451 | bm_cover -g
+			EOF
+			exit 0
+			;;
+		-*)
+			echo "Error: Unknown option: $1" >&2
+			exit 1
+			;;
+		[0-9]*)
+			if [ -z "${isbn}" ]; then
+				isbn="${1}"
+			else
+				echo "Error: Multiple ISBNs provided" >&2
+				exit 1
+			fi
+			shift
+			;;
+	esac
+
+done
+
+# ISBN入力確認
+if [ -p /dev/stdin ]; then
+
+	read -r isbn < /dev/stdin
+
+elif [ -z "${isbn}" ]; then
+
+	echo "Error: ISBN not provided" >&2
+	exit 1
+
+fi
+
+# ====== 関数の設定 ======
+# データを取得する関数
+fetch_data() {
+
+	url="${1}"
+	case "${downloader}" in
+		wget)
+			if ! wget -q -O - -- "${url}" 2>/dev/null; then
+				echo 'Error: Failed to fetch data from URL' >&2
+				exit 1
+			fi
+			;;
+		curl)
+			if ! curl -L -s -- "${url}" 2>/dev/null; then
+				echo 'Error: Failed to fetch data from URL' >&2
+				exit 1
+			fi
+			;;
+		*)
+			echo 'Error: No available downloader' >&2
+			exit 1
+			;;
+
+	esac
+
+}
+
+# openBDから書影URLを取得する関数
+fetch_openbd_cover() {
+
+	isbn_val="${1}"
+	url="https://api.openbd.jp/v1/get?isbn=${isbn_val}"
+
+	fetch_data "${url}" |
+	tr -d '\n' |
+	grep -o '"ResourceLink":"[^"]*"' |
+	head -1 |
+	sed 's/"ResourceLink":"\([^"]*\)"/\1/'
+
+}
+
+# Google Booksから書影URLを取得する関数
+fetch_google_cover() {
+
+	isbn_val="${1}"
+	url="https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn_val}"
+
+	fetch_data "${url}" |
+	tr -d '\n' |
+	grep -o '"thumbnail":"[^"]*"' |
+	head -1 |
+	sed 's/"thumbnail":"\([^"]*\)"/\1/'
+
+}
+# ====== 関数の設定ここまで ======
+
+
+# ====== メイン処理 ======
+# 使用するAPIに応じて書影URLを取得
+result=""
+case "${api}" in
+	openbd)
+		result="$(fetch_openbd_cover "${isbn}")"
+		;;
+	google)
+		result="$(fetch_google_cover "${isbn}")"
+		;;
+esac
+
+# 結果が空かつフォールバックが有効な場合
+if [ -z "${result}" ] && [ "${fallback_enabled}" -eq 1 ]; then
+	case "${api}" in
+		openbd)
+			result="$(fetch_google_cover "${isbn}")"
+			;;
+		google)
+			result="$(fetch_openbd_cover "${isbn}")"
+			;;
+	esac
+fi
+
+# 結果を出力またはエラー処理
+if [ -z "${result}" ]; then
+	echo "Error: No cover image found for ISBN: ${isbn}" >&2
+	exit 1
+else
+	echo "${result}"
+fi
+# ====== メイン処理ここまで ======
