@@ -106,9 +106,9 @@ bm_search -n 9784839961451
 bm_search -f 9784488025552
 ```
 
-パイプもしくは引数でISBNを渡すと書籍情報を取得し,  
-"ISBN,タイトル,著者名,出版社,発売日"の形式で出力  
-デフォルトではopenBDのAPIを使用  
+パイプもしくは引数でISBNを渡すと書籍情報を取得し,
+"ISBN,タイトル,著者名,出版社,発売日"の形式で出力
+デフォルトではopenBDのAPIを使用
 
 国立国会図書館のAPIの処理に[parsrx.sh](https://github.com/ShellShoccar-jpn/Parsrs/blob/master/parsrx.sh)を使用しているため,`parsrx.sh`があるディレクトリにパスが通っている必要がある
 
@@ -121,6 +121,46 @@ bm_search -f 9784488025552
     - `-n`
 
         - 国立国会図書館のAPIを利用
+
+    - `-f`
+
+        - フォールバック処理を有効化
+
+            - データが見つからなかった場合にもう一方のAPIを使用して再検索を行う
+
+    - `-h`
+
+        - ヘルプを出力
+
+### bm_cover
+```sh
+# 引数で渡す
+bm_cover 9784839961451
+
+# パイプで渡す
+echo "9784839961451" | bm_cover
+
+# APIを指定する
+# -o openBD(デフォルト)
+# -g Google Books
+bm_cover -g 9784839961451
+
+# データが見つからない場合にフォールバック
+bm_cover -f 9784488025552
+```
+
+パイプもしくは引数でISBNを渡すと書影のURLを取得し,出力
+デフォルトではopenBDのAPIを使用
+
+- オプション
+
+    - `-o`
+
+        - openBDのAPIを利用(デフォルト)
+
+    - `-g`
+
+        - Google Books APIを利用
 
     - `-f`
 
