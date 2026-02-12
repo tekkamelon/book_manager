@@ -70,6 +70,12 @@ post_proc(){
 			# 取得データをテーブル表示
 			echo "${last_line}" | c2h -v header=no
 
+			# 書影を取得・表示
+			cover_url=$(echo "${isbn}" | bm_cover 2>/dev/null || echo "")
+			if [ -n "${cover_url}" ]; then
+				printf '<div class="cover-image"><img src="%s" alt="書影" style="max-width:200px;max-height:300px;margin-top:20px;"></div>\n' "${cover_url}"
+			fi
+
 		else
 
 			echo '<p class="result">無効なデータ形式です</p>'
