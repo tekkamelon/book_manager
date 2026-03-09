@@ -3,31 +3,41 @@
 
 <head>
 	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>蔵書検索 - Book Manager</title>
 	<link rel="stylesheet" href="../css/style.css">
 </head>
 
 <body>
-	<h1>蔵書検索</h1>
-	<p><a href="index.html">トップ</a> | <a href="add.html">追加</a> | <a href="settings.html">設定</a></p>
+	<div class="container">
+		<h1>蔵書検索</h1>
 
-	<form method="POST" action="../cgi-bin/search.cgi">
-		<p>
-			<label>検索ワード: <input type="search" name="q" required></label>
-		</p>
-		<p>
-			<small id="current_csv_file">対象ファイル: 読み込み中...</small>
-		</p>
+		<nav>
+			<a href="index.html">トップ</a>
+			<a href="add.html">追加</a>
+			<a href="settings.html">設定</a>
+		</nav>
 
-		<script src="../js/settings.js"></script>
-		<script>
-			// 設定ファイルからcsv_fileの値を読み込む
-			loadCsvFilePath('current_csv_file', '対象ファイル: ', '設定の読み込みに失敗しました:');
-		</script>
-		<p>
-			<input type="submit" value="検索">
-		</p>
-	</form>
+		<div class="card">
+			<form method="POST" action="../cgi-bin/search.cgi">
+				<div class="form-group">
+					<label for="q">検索ワード</label>
+					<input type="search" id="q" name="q" required>
+				</div>
+				<p>
+					<small id="current_csv_file">対象ファイル: 読み込み中...</small>
+				</p>
+
+				<script src="../js/settings.js"></script>
+				<script>
+					loadCsvFilePath('current_csv_file', '対象ファイル: ', '設定の読み込みに失敗しました:');
+				</script>
+				<p>
+					<input type="submit" value="検索">
+				</p>
+			</form>
+		</div>
+	</div>
 
 </body>
 
