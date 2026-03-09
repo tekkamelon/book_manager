@@ -3,39 +3,49 @@
 
 <head>
 	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Book Manager</title>
 	<link rel="stylesheet" href="../css/style.css">
 </head>
 
 <body>
-	<h1>Book Manager</h1>
-	<p><button onclick="location.href='search.html'">蔵書検索</button></p>
-	<p><button onclick="location.href='add.html'">書籍追加・データ検索</button></p>
-	<p><button id="helpButton">編集</button></p>
-	<script src="../js/settings.js"></script>
-	<script>
-		document.addEventListener('DOMContentLoaded', function () {
-			document.getElementById('helpButton').addEventListener('click', function () {
-				console.log('ボタンがクリックされました');
-				loadCodeServerUrl(function (url) {
-					console.log('URL読み込み完了:', url);
-					if (url) {
-						console.log('URLに遷移します:', url);
-						window.open(url, '_blank');
-					} else {
-						alert('code-serverのURLが設定されておりません');
-					}
+	<div class="container">
+		<h1>Book Manager</h1>
+
+		<div class="card">
+			<div class="button-group">
+				<button onclick="location.href='search.html'">蔵書検索</button>
+				<button onclick="location.href='add.html'">書籍追加・データ検索</button>
+				<button id="helpButton">編集</button>
+				<button onclick="location.href='settings.html'">設定</button>
+			</div>
+		</div>
+
+		<script src="../js/settings.js"></script>
+		<script>
+			document.addEventListener('DOMContentLoaded', function () {
+				document.getElementById('helpButton').addEventListener('click', function () {
+					console.log('ボタンがクリックされました');
+					loadCodeServerUrl(function (url) {
+						console.log('URL読み込み完了:', url);
+						if (url) {
+							console.log('URLに遷移します:', url);
+							window.open(url, '_blank');
+						} else {
+							alert('code-serverのURLが設定されておりません');
+						}
+					});
 				});
 			});
-		});
-	</script>
-	<p><button onclick="location.href='settings.html'">設定</button></p>
-</body>
+		</script>
+	</div>
 
-<footer>
-	<h3>Links</h3>
-	<p><a href="https://github.com/tekkamelon/book_manager/tree/experimental">GitHub Repository</a></p>
-	<p>Reference: <a href="https://github.com/ShellShoccar-jpn/misc-tools">urldecode</a></p>
-</footer>
+	<footer>
+		<h3>Links</h3>
+		<p><a href="https://github.com/tekkamelon/book_manager/tree/experimental">GitHub Repository</a></p>
+		<p>Reference: <a href="https://github.com/ShellShoccar-jpn/misc-tools">urldecode</a></p>
+	</footer>
+
+</body>
 
 </html>
