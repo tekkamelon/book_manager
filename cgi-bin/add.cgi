@@ -55,7 +55,7 @@ run_bm_cover(){
 	# 書影を取得・表示
 	cover_url=$(echo "${isbn}" | bm_cover 2>/dev/null || echo "")
 	if [ -n "${cover_url}" ]; then
-		printf '<div class="cover-image"><img src="%s" alt="書影" style="max-width:200px;max-height:300px;margin-top:20px;"></div>\n' "${cover_url}"
+		printf '<div class="cover-image"><img src="%s" alt="書影" style="max-width:200px;max-height:300px;margin-top:20px;display:block;margin-left:auto;margin-right:auto;box-shadow:0 4px 12px rgba(0,0,0,0.3);border-radius:4px;"></div>\n' "${cover_url}"
 	fi
 }
 
@@ -115,7 +115,13 @@ cat << EOF
 </head>
 <body>
 	<h1>書籍追加結果</h1>
-	<p><a href="../html/search.html">検索</a> | <a href="../html/add.html">追加</a> | <a href="../html/settings.html">設定</a> | <a href="../html/index.html">メニュー</a></p>
+
+	<nav>
+		<a href="../html/index.html">トップ</a>
+		<a href="../html/search.html">検索</a>
+		<a href="../html/add.html">追加</a>
+		<a href="../html/settings.html">設定</a>
+	</nav>
 <!-- EOF -->
 	$(post_proc)
 
