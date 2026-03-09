@@ -1,5 +1,8 @@
+/* カラースキームの定義 */
 :root {
 	color-scheme: light dark;
+
+	/* ライトモード/ダークモード別の配色変数 */
 	--bg-primary: light-dark(#f5f0e8, #2d2a26);
 	--bg-secondary: light-dark(#ebe4d8, #3d3833);
 	--bg-card: light-dark(#fffbf5, #3d3833);
@@ -13,10 +16,12 @@
 	--success-text: light-dark(#2e7d32, #81c784);
 }
 
+/* すべての要素のボックス-sizing設定 */
 * {
 	box-sizing: border-box;
 }
 
+/* ページ全体の基本スタイル */
 body {
 	font-family: "Noto Serif", "Georgia", serif;
 	margin: 0;
@@ -24,17 +29,19 @@ body {
 	line-height: 1.8;
 	color: var(--text-primary);
 	background-color: var(--bg-primary);
-	background-image: 
+	background-image:
 		radial-gradient(ellipse at top, transparent 0%, var(--bg-primary) 70%),
 		linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
 	min-height: 100vh;
 }
 
+/* コンテンツのコンテナ */
 .container {
 	max-width: 720px;
 	margin: 0 auto;
 }
 
+/* 見出し1のスタイル */
 h1 {
 	font-size: 2.2rem;
 	font-weight: 600;
@@ -44,23 +51,27 @@ h1 {
 	letter-spacing: 0.05em;
 }
 
+/* 見出し2のスタイル */
 h2 {
 	font-size: 1.4rem;
 	color: var(--accent);
 	margin-bottom: 1.2rem;
 }
 
+/* 見出し3のスタイル */
 h3 {
 	font-size: 1.1rem;
 	color: var(--text-secondary);
 }
 
+/* ナビゲーションバーのスタイル */
 nav {
 	margin-bottom: 2rem;
 	padding: 1rem 0;
 	border-bottom: 1px solid var(--border);
 }
 
+/* ナビゲーションリンクのスタイル */
 nav a {
 	color: var(--accent);
 	text-decoration: none;
@@ -70,12 +81,14 @@ nav a {
 	transition: all 0.2s ease;
 }
 
+/* ナビゲーションリンクのホバー時スタイル */
 nav a:hover {
 	color: var(--bg-primary);
 	background-color: var(--accent);
 	text-decoration: none;
 }
 
+/* カードコンポーネントのスタイル */
 .card {
 	background: var(--bg-card);
 	border-radius: 12px;
@@ -85,6 +98,7 @@ nav a:hover {
 	border: 1px solid var(--border);
 }
 
+/* ボタングループのスタイル */
 .button-group {
 	display: flex;
 	flex-direction: column;
@@ -92,6 +106,7 @@ nav a:hover {
 	margin-top: 1rem;
 }
 
+/* ボタン、送信ボタン共通のスタイル */
 button,
 input[type="submit"],
 .button {
@@ -113,6 +128,7 @@ input[type="submit"],
 	text-decoration: none;
 }
 
+/* ボタンのホバー時スタイル */
 button:hover,
 input[type="submit"]:hover,
 .button:hover {
@@ -121,26 +137,31 @@ input[type="submit"]:hover,
 	box-shadow: 0 4px 12px var(--shadow);
 }
 
+/* ボタンのアクティブ時スタイル */
 button:active,
 input[type="submit"]:active {
 	transform: translateY(0);
 	box-shadow: 0 1px 4px var(--shadow);
 }
 
+/* ボタンのフォーカス時スタイル */
 button:focus,
 input[type="submit"]:focus {
 	outline: 2px solid var(--accent);
 	outline-offset: 3px;
 }
 
+/* フォームのスタイル */
 form {
 	margin-bottom: 1.5rem;
 }
 
+/* フォームグループのスタイル */
 .form-group {
 	margin-bottom: 1.5rem;
 }
 
+/* ラベルのスタイル */
 label {
 	display: block;
 	margin-bottom: 0.5rem;
@@ -148,6 +169,7 @@ label {
 	font-size: 0.95rem;
 }
 
+/* テキスト入力・検索入力のスタイル */
 input[type="text"],
 input[type="search"] {
 	width: 100%;
@@ -162,6 +184,7 @@ input[type="search"] {
 	transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+/* テキスト入力・検索入力のフォーカス時スタイル */
 input[type="text"]:focus,
 input[type="search"]:focus {
 	outline: none;
@@ -169,6 +192,7 @@ input[type="search"]:focus {
 	box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.15);
 }
 
+/* {small}タグのスタイル */
 small {
 	display: block;
 	margin-top: 0.5rem;
@@ -176,6 +200,7 @@ small {
 	font-size: 0.85rem;
 }
 
+/* テーブルのスタイル */
 table {
 	width: 100%;
 	border-collapse: separate;
@@ -185,6 +210,7 @@ table {
 	overflow: hidden;
 }
 
+/* テーブルヘッダー・データセルのスタイル */
 th,
 td {
 	border: 1px solid var(--border);
@@ -192,27 +218,32 @@ td {
 	text-align: left;
 }
 
+/* テーブルヘッダーのスタイル */
 th {
 	background: var(--bg-secondary);
 	font-weight: 600;
 	color: var(--accent);
 }
 
+/* 偶数行の背景色 */
 tr:nth-child(even) {
 	background: var(--bg-secondary);
 }
 
+/* リンクのスタイル */
 a {
 	color: var(--accent);
 	text-decoration: none;
 	transition: color 0.2s ease;
 }
 
+/* リンクのホバー時スタイル */
 a:hover {
 	color: var(--accent-hover);
 	text-decoration: underline;
 }
 
+/* 結果表示ボックスのスタイル */
 .result {
 	background: var(--success-bg);
 	color: var(--success-text);
@@ -222,6 +253,7 @@ a:hover {
 	border: 1px solid var(--success-text);
 }
 
+/* トグルswitchのコンテナスタイル */
 .toggle-switch {
 	position: relative;
 	display: inline-block;
@@ -231,12 +263,14 @@ a:hover {
 	margin-left: 0.5rem;
 }
 
+/* トグルswitchのチェックボックススタイル */
 .toggle-switch input {
 	opacity: 0;
 	width: 0;
 	height: 0;
 }
 
+/* トグルswitchのスライダー本体スタイル */
 .toggle-slider {
 	position: absolute;
 	cursor: pointer;
@@ -249,6 +283,7 @@ a:hover {
 	border-radius: 28px;
 }
 
+/* トグルswitchのスライダーハンドルのスタイル */
 .toggle-slider:before {
 	position: absolute;
 	content: "";
@@ -261,14 +296,17 @@ a:hover {
 	border-radius: 50%;
 }
 
-input:checked + .toggle-slider {
+/* トグルswitchがチェックされた時のスライダー本体スタイル */
+input:checked+.toggle-slider {
 	background-color: var(--accent);
 }
 
-input:checked + .toggle-slider:before {
+/* トグルswitchがチェックされた時のスライダーハンドルスタイル */
+input:checked+.toggle-slider:before {
 	transform: translateX(24px);
 }
 
+/* フッターのスタイル */
 footer {
 	margin-top: 3rem;
 	padding-top: 2rem;
@@ -277,10 +315,12 @@ footer {
 	color: var(--text-secondary);
 }
 
+/* フッター内の段落のスタイル */
 footer p {
 	margin: 0.4rem 0;
 }
 
+/* モバイル向けのレスポンシブデザイン */
 @media (max-width: 600px) {
 	body {
 		padding: 20px;
