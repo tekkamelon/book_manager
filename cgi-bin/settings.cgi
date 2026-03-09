@@ -129,8 +129,10 @@ cat << EOF
     <h1>設定結果</h1>
 
     <nav>
+        <a href="../html/index.html">トップ</a>
+        <a href="../html/search.html">蔵書検索</a>
+        <a href="../html/add.html">書籍追加・データ検索</a>
         <a href="../html/settings.html">設定ページ</a>
-        <a href="../html/index.html">メニュー</a>
     </nav>
 	$(result)
 
