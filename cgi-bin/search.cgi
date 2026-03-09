@@ -92,7 +92,13 @@ cat << EOF
 </head>
 <body>
 	<h1>蔵書検索結果</h1>
-	<p><a href="../html/index.html">トップ</a> | <a href="../html/search.html">検索</a> | <a href="../html/add.html">追加</a> | <a href="../html/settings.html">設定</a> </p>
+
+	<nav>
+		<a href="../html/index.html">トップ</a>
+		<a href="../html/search.html">検索</a>
+		<a href="../html/add.html">追加</a>
+		<a href="../html/settings.html">設定</a>
+	</nav>
 
 	$(post_proc)
 
