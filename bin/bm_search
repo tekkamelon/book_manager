@@ -2,7 +2,7 @@
 
 set -eu
 
-# 環境変数設定
+# ====== 変数の設定 ======
 export LC_ALL=C
 export LANG=C
 export POSIXLY_CORRECT=1
@@ -28,8 +28,8 @@ else
 
 fi
 
-# 引数解析
 isbn=""
+
 
 # 引数がある場合にループ
 while [ "${#}" -gt 0 ]; do
@@ -85,6 +85,7 @@ elif [ -z "${isbn}" ]; then
 	exit 1
 
 fi
+# ===== 変数の設定ここまで ======
 
 
 # ====== 関数の設定 ======
