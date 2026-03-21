@@ -1,11 +1,11 @@
 #!/bin/sh
 
+set -eu
+
 # 環境変数設定
 export LC_ALL=C
 export LANG=C
 export POSIXLY_CORRECT=1
-
-set -eu
 
 # 変数を初期化
 api="openbd"
@@ -14,12 +14,18 @@ downloader=""
 
 # ダウンローダ検出
 if command -v wget >/dev/null 2>&1; then
+
 	downloader="wget"
+
 elif command -v curl >/dev/null 2>&1; then
+
 	downloader="curl"
+
 else
+
 	echo 'Error: please install "wget" or "curl"' >&2
 	exit 1
+
 fi
 
 # 引数解析
@@ -30,6 +36,7 @@ while [ "${#}" -gt 0 ]; do
 
 	# 引数の内容に応じて処理
 	case "${1}" in
+
 		-o) api="openbd"; shift ;;
 		-n) api="ndl"; shift ;;
 		-f) fallback_enabled=1; shift ;;
@@ -62,6 +69,7 @@ while [ "${#}" -gt 0 ]; do
 			fi
 			shift
 			;;
+
 	esac
 
 done
@@ -85,6 +93,7 @@ fetch_data() {
 
 	url="${1}"
 	case "${downloader}" in
+
 		wget)
 			if ! wget -q -O - -- "${url}" 2>/dev/null; then
 				echo 'Error: Failed to fetch data from URL' >&2
@@ -182,32 +191,43 @@ fetch_ndl() {
 # ====== メイン処理 ======
 # 使用するAPIに応じて書籍情報を取得
 case "${api}" in
+
 	openbd)
 		result="$(fetch_openbd "${isbn}")"
 		;;
+
 	ndl)
 		result="$(fetch_ndl "${isbn}")"
 		;;
+
 esac
 
 # 結果が空かつフォールバックが有効な場合
 if [ -z "${result}" ] && [ "${fallback_enabled}" -eq 1 ]; then
+
 	case "${api}" in
+
 		openbd)
 			result="$(fetch_ndl "${isbn}")"
 			;;
 		ndl)
 			result="$(fetch_openbd "${isbn}")"
 			;;
+
 	esac
+
 fi
 
 # 結果を出力またはエラー処理
 if [ -z "${result}" ]; then
+
 	echo "Error: No data found for ISBN: ${isbn}" >&2
 	exit 1
+
 else
+
 	echo "${result}"
+
 fi
 # ====== メイン処理ここまで ======
 
