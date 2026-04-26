@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>外部リンクの確認 - Book Manager</title>
+	<link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+	<div class="container">
+		<h1>外部リンクの確認</h1>
+
+		<div class="card">
+			<p>外部サイトに移動しようとしています:</p>
+			<div class="result" id="urlDisplay">読み込み中...</div>
+			<p>このリンクは信用できるものですか？</p>
+
+			<div class="button-group">
+				<button id="confirmButton">移動する</button>
+				<button onclick="location.href='index.html'">キャンセル</button>
+			</div>
+		</div>
+	</div>
+
+	<script src="../js/settings.js"></script>
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			const params = new URLSearchParams(window.location.search);
+			const url = params.get('url');
+
+			if (url) {
+				document.getElementById('urlDisplay').textContent = url;
+
+				document.getElementById('confirmButton').addEventListener('click', function () {
+					window.open(url, '_blank');
+					location.href = 'index.html';
+				});
+			} else {
+				document.getElementById('urlDisplay').textContent = 'URLが指定されていません';
+				document.getElementById('confirmButton').disabled = true;
+			}
+		});
+	</script>
+</body>
+
+</html>

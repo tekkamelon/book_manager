@@ -4,8 +4,8 @@ document.addEventListener('DOMContentLoaded', function () {
 		loadCodeServerUrl(function (url) {
 			console.log('URL読み込み完了:', url);
 			if (url) {
-				console.log('URLに遷移します:', url);
-				window.open(url, '_blank');
+				console.log('クッションページにリダイレクトします:', url);
+				location.href = 'confirm.html?url=' + encodeURIComponent(url);
 			} else {
 				alert('code-serverのURLが設定されておりません');
 			}
