@@ -63,9 +63,11 @@ post_proc(){
 
 	data=$(run_bm_search)
 
-	if [ -z "${data}" ]; then
+if [ -z "${data}" ]; then
 
-		printf '<p class="result">書籍情報が見つかりませんでした: %s</p>\n' "$(printf '%s' "${isbn}" | sed 's/&/\&amp;/g;s/</\</g;s/>/\>/g')"
+		safe_isbn=$(printf '%s' "${isbn}" | sed 's/&/\&/g;s/</\</g;s/>/\>/g')
+		printf '<p class="result">書籍情報が見つかりませんでした: %s</p>\n' "${safe_isbn}"
+		printf '<p><a href="../html/google_search.html?isbn=%s" class="button">Google で検索</a></p>\n' "${safe_isbn}"
 
 	else
 
@@ -98,7 +100,7 @@ post_proc(){
 	fi
 
 }
-# 関数の設定ここまで=
+# 関数の設定ここまで
 
 
 # HTML
