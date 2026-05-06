@@ -12,7 +12,7 @@
 
 - 与えられたタスクの終了後
     - 以下のコマンドを実行
-        - `export DISPLAY=:0 ; notify-send -t 3000 -u critical '🤖' 'タスク完了' ; PULSE_SERVER=unix:/run/user/$(id -u)/pulse/native paplay /usr/share/sounds/freedesktop/stereo/complete.oga`
+        - `bell-notify`
             - もし実行できない場合はそのまま終了して構いません
 
 ### 調査
@@ -25,13 +25,15 @@
 
 ### コードの書式
 
+- 差分ごとにコードを出力
+- ソースコード本体には行番号を付与しない
 - コメント
     - 記号は可能な限り半角文字を使用
 
 #### シェルスクリプト
 
+- Skillsの`posix-shell`があればそちらを参照
 - 特別な指示がなければ可能な限り以下の条件に従うこと
-    - Skillsの`posix-shell`があればそちらを参照
     - POSIX準拠のコマンドを使用
     - bashismを使用しない
     - 変数
