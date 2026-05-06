@@ -69,6 +69,10 @@ while [ "${#}" -gt 0 ]; do
 			fi
 			shift
 			;;
+		*)
+			echo "Error: Invalid argument: ${1}" >&2
+			exit 1
+			;;
 
 	esac
 
@@ -84,6 +88,20 @@ elif [ -z "${isbn}" ]; then
 	echo "Error: ISBN not provided" >&2
 	exit 1
 
+fi
+
+# ISBN形式検証(数字のみ、10桁または13桁)
+case "${isbn}" in
+	*[!0-9]*)
+		echo "Error: ISBN must contain digits only" >&2
+		exit 1
+		;;
+esac
+
+isbn_len="$(printf '%s' "${isbn}" | wc -c | tr -d '[:space:]')"
+if [ "${isbn_len}" -ne 10 ] && [ "${isbn_len}" -ne 13 ]; then
+	echo "Error: ISBN must be 10 or 13 digits" >&2
+	exit 1
 fi
 # ===== 変数の設定ここまで ======
 
@@ -231,4 +249,3 @@ else
 
 fi
 # ====== メイン処理ここまで ======
-
