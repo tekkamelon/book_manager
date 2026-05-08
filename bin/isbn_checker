@@ -2,46 +2,82 @@
 
 BEGIN{
 
-	# 1文字ずつフィールドに分割
+	# 各文字を1フィールドとして扱う
 	FS = ""
 
 }
 
 {
 
-	# カウンタ用変数iを1から13まで2づつ増やす
-	for(i = 1; i <= 13; i += 2)
+	# 入力ISBNを保持
+	isbn = $0
 
-		# 各フィールドを足しodd_numに代入
-		odd_num += $i
+	# 入力文字列の長さを取得
+	len = length(isbn)
 
-	# カウンタ用変数iを2から12まで2づつ増やす
-	for(i = 2; i <= 12; i += 2)
+	# ISBNの桁数が10桁または13桁か確認
+	if(len != 10 && len != 13){
+		# 桁数が不正な場合はエラー終了
+		print "Error: ISBN must be 10 or 13 digits" > "/dev/stderr"
+		exit 1
+	}
 
-		# 各フィールドを足しeven_numに代入
-		even_num += $i
+	# ISBNが数字のみで構成されているか確認
+	if(isbn ~ /[^0-9]/){
+		# 数字以外が含まれる場合はエラー終了
+		print "Error: ISBN must contain digits only" > "/dev/stderr"
+		exit 1
+	}
 
-	# 奇数桁と偶数桁の3倍を合計
-	addition = odd_num + even_num * 3
+	# 13桁ISBNの検算を行う
+	if(len == 13){
 
-}
+		# 奇数桁の合計値を初期化
+		odd_num = 0
 
-END{
+		# 偶数桁の合計値を初期化
+		even_num = 0
 
-	# "addition"を10で割った剰余が0なら真,そうでなければ偽
-	if(addition % 10 == 0){
+		# 奇数桁の数値を加算
+		for(i = 1; i <= 13; i += 2)
+			odd_num += $i
 
-		# 真の場合は入力内容をそのままを出力
-		print $0
+		# 偶数桁の数値を加算
+		for(i = 2; i <= 12; i += 2)
+			even_num += $i
 
+		# ISBN-13の重み計算結果を求める
+		addition = odd_num + even_num * 3
+
+		# 重み計算結果が10で割り切れるか確認
+		if(addition % 10 == 0){
+			# 正常なISBNなのでそのまま出力
+			print isbn
+		}else{
+			# 検算に失敗した場合はエラー終了
+			print "Error: ISBN is bad!" > "/dev/stderr"
+			exit 1
+		}
+
+	# 10桁ISBNの検算を行う
 	}else{
 
-		# 偽の場合はエラーメッセージを出力,エラー終了
-		print "Error: ISBN is bad!" > "/dev/stderr"
+		# 検算用の合計値を初期化
+		sum = 0
 
-		exit 1
+		# 各桁に重み(1から10)を掛けて加算
+		for(i = 1; i <= 10; i++)
+			sum += i * $i
 
+		# 合計値が11で割り切れるか確認
+		if(sum % 11 == 0){
+			# 正常なISBNなのでそのまま出力
+			print isbn
+		}else{
+			# 検算に失敗した場合はエラー終了
+			print "Error: ISBN is bad!" > "/dev/stderr"
+			exit 1
+		}
 	}
-	
-}
 
+}

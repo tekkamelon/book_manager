@@ -2,250 +2,289 @@
 
 set -eu
 
-# ====== 変数の設定 ======
+# 文字コード系の挙動を固定
 export LC_ALL=C
 export LANG=C
 export POSIXLY_CORRECT=1
 
-# 変数を初期化
+# 使用APIの初期値を設定
 api="openbd"
+
+# フォールバックの有効/無効を保持
 fallback_enabled=0
+
+# isbn_checker未導入時の強制実行フラグを保持
+force_without_checker=0
+
+# 利用ダウンローダを保持
 downloader=""
 
-# ダウンローダ検出
+# wgetの有無を確認
 if command -v wget >/dev/null 2>&1; then
 
+	# wgetを利用
 	downloader="wget"
 
+# curlの有無を確認
 elif command -v curl >/dev/null 2>&1; then
 
+	# curlを利用
 	downloader="curl"
 
 else
 
+	# ダウンローダ未導入時はエラー終了
 	echo 'Error: please install "wget" or "curl"' >&2
 	exit 1
 
 fi
 
+# ISBN入力値を初期化
 isbn=""
 
-
-# 引数がある場合にループ
+# コマンドライン引数を順に処理
 while [ "${#}" -gt 0 ]; do
-
-	# 引数の内容に応じて処理
 	case "${1}" in
-
-		-o) api="openbd"; shift ;;
-		-n) api="ndl"; shift ;;
-		-f) fallback_enabled=1; shift ;;
+		-o)
+			# openBDを選択
+			api="openbd"
+			shift
+			;;
+		-n)
+			# NDLを選択
+			api="ndl"
+			shift
+			;;
+		-f)
+			# フォールバックを有効化
+			fallback_enabled=1
+			shift
+			;;
+		-F)
+			# isbn_checker未導入時でも続行可能に
+			force_without_checker=1
+			shift
+			;;
 		-h)
-			cat <<- EOF
+			# ヘルプを表示
+			cat <<- 'EOF_HELP'
 			Usage: bm_search [options] <ISBN>
 
 			Options:
 			  -o        Use openBD (default)
 			  -n        Use National Diet Library (NDL) API
 			  -f        Enable fallback to the other API if no result
+			  -F        Force run even if isbn_checker is not available
 			  -h        Show this help message and exit
-
-			Examples:
-			  bm_search -o 9784839961451
-			  echo 9784839961451 | bm_search -n
-			EOF
+			EOF_HELP
 			exit 0
 			;;
 		-*)
+			# 不明なオプションはエラー終了
 			echo "Error: Unknown option: $1" >&2
 			exit 1
 			;;
 		[0-9]*)
+			# ISBN引数の重複指定を検出
 			if [ -z "${isbn}" ]; then
+
+				# ISBNを保持
 				isbn="${1}"
+
 			else
+
+				# ISBNが複数指定されたためエラー終了
 				echo "Error: Multiple ISBNs provided" >&2
 				exit 1
+
 			fi
 			shift
 			;;
 		*)
+			# 不正な引数はエラー終了
 			echo "Error: Invalid argument: ${1}" >&2
 			exit 1
 			;;
-
 	esac
-
 done
 
-# ISBN入力確認
+# パイプ入力の有無を確認
 if [ -p /dev/stdin ]; then
 
+	# パイプ入力からISBNを読み込む
 	read -r isbn < /dev/stdin
 
+# 引数でも標準入力でもISBNが未指定か確認
 elif [ -z "${isbn}" ]; then
 
+	# ISBN未指定時はエラー終了
 	echo "Error: ISBN not provided" >&2
 	exit 1
 
 fi
 
-# ISBN形式検証(数字のみ、10桁または13桁)
+# ISBNが数字のみか確認
 case "${isbn}" in
 	*[!0-9]*)
+		# 数字以外が含まれる場合はエラー終了
 		echo "Error: ISBN must contain digits only" >&2
 		exit 1
 		;;
 esac
 
-isbn_len="$(printf '%s' "${isbn}" | wc -c | tr -d '[:space:]')"
-if [ "${isbn_len}" -ne 10 ] && [ "${isbn_len}" -ne 13 ]; then
-	echo "Error: ISBN must be 10 or 13 digits" >&2
-	exit 1
+# isbn_checkerコマンドの存在を確認
+if command -v isbn_checker >/dev/null 2>&1; then
+
+	# isbn_checkerで検算を実施
+	if ! printf '%s\n' "${isbn}" | isbn_checker >/dev/null; then
+
+		# 検算失敗時はエラー終了
+		echo "Error: ISBN checksum validation failed" >&2
+		exit 1
+
+	fi
+
+else
+
+	# 強制実行オプション未指定ならエラー終了
+	if [ "${force_without_checker}" -ne 1 ]; then
+
+		echo 'Error: isbn_checker not found in PATH. Use -F to force run without checksum check.' >&2
+		exit 1
+
+	fi
+
 fi
-# ===== 変数の設定ここまで ======
 
-
-# ====== 関数の設定 ======
-# データを取得する関数
+# 指定URLからデータを取得
 fetch_data() {
-
 	url="${1}"
-	case "${downloader}" in
 
+	# 利用可能なダウンローダで取得
+	case "${downloader}" in
 		wget)
+			# wgetでデータ取得を試みる
 			if ! wget -q -O - -- "${url}" 2>/dev/null; then
+
+				# 取得失敗時はエラー終了
 				echo 'Error: Failed to fetch data from URL' >&2
 				exit 1
+
 			fi
 			;;
 		curl)
+			# curlでデータ取得を試みる
 			if ! curl -L -s -- "${url}" 2>/dev/null; then
+
+				# 取得失敗時はエラー終了
 				echo 'Error: Failed to fetch data from URL' >&2
 				exit 1
+
 			fi
 			;;
 		*)
+			# 想定外のダウンローダ状態はエラー終了
 			echo 'Error: No available downloader' >&2
 			exit 1
 			;;
-
 	esac
-
 }
 
-# openBDから書籍情報を取得する関数
+# openBDから書誌情報を取得してCSV形式へ整形
 fetch_openbd() {
-
 	isbn_val="${1}"
 	url="https://api.openbd.jp/v1/get?isbn=${isbn_val}&pretty"
 
 	fetch_data "${url}" |
-	grep -F -e "isbn" -e "title" -e "publisher" -e "pubdate" -e "author" |
-	awk -F "\"" '
-	NR < 5 {
-		print $4
-	}
-	END {
-		gsub("," , "", $4)
-		gsub(/[0-9][0-9][0-9][0-9]-/, "", $4)
-		gsub(/[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]/, "", $4)
-		gsub(/[0-9][0-9][0-9][0-9]"/, "", $4)
-		print $4
-	}
-	' |
-	paste -s -d ',' - |
-	sed '/^$/d'
-
+		grep -F \
+			-e "isbn" \
+			-e "title" \
+			-e "publisher" \
+			-e "pubdate" \
+			-e "author" |
+		awk -F '"' '
+			NR < 5 {
+				print $4
+			}
+			END {
+				gsub(",", "", $4)
+				gsub(/[0-9][0-9][0-9][0-9]-/, "", $4)
+				gsub(/[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]/, "", $4)
+				gsub(/[0-9][0-9][0-9][0-9]"/, "", $4)
+				print $4
+			}
+		' |
+		paste -s -d ',' - |
+		sed '/^$/d'
 }
 
-# 国立国会図書館から書籍情報を取得する関数
+# NDLから書誌情報を取得してCSV形式へ整形
 fetch_ndl() {
-
 	isbn_val="${1}"
 	url="https://iss.ndl.go.jp/api/sru?operation=searchRetrieve&version=1.2&recordSchema=dcndl&onlyBib=true&recordPacking=xml&query=isbn=${isbn_val}%20AND%20dpid=iss-ndl-opac"
 
 	fetch_data "${url}" |
-
-	parsrx.sh |
-
-	grep -F -e "BibResource/dcterms:title" -e "BibResource/dc:creator" -e "BibResource/dcterms:publisher/foaf:Agent/foaf:name" -e "BibResource/dcterms:date" |
-
-	cut -d" " -f2- |
-
-	paste -s -d ',' - |
-
-	awk -F, -v isbn="${isbn_val}" '
-
-	BEGIN{
-
-		OFS = ","
-
-	}
-
-	{
-
-		# $1から$4のいずれも空でない場合のみ処理
-		if ($1 != "" && $2 != "" && $3 != "" && $4 != "") {
-
-			if($5 != ""){
-
-				# 海外本の翻訳者への対応
-				print isbn, $1, $4, $5, $2 " " $3
-
-			}else{
-
-				print isbn, $1, $3, $4, $2
-
+		parsrx.sh |
+		grep -F \
+			-e "BibResource/dcterms:title" \
+			-e "BibResource/dc:creator" \
+			-e "BibResource/dcterms:publisher/foaf:Agent/foaf:name" \
+			-e "BibResource/dcterms:date" |
+		cut -d ' ' -f2- |
+		paste -s -d ',' - |
+		awk -F ',' -v isbn="${isbn_val}" '
+			BEGIN {
+				OFS = ","
 			}
+			{
+				if ($1 != "" && $2 != "" && $3 != "" && $4 != "") {
 
-		}
+					if ($5 != "") {
 
-	}
-	'
+						print isbn, $1, $4, $5, $2 " " $3
+
+					} else {
+
+						print isbn, $1, $3, $4, $2
+
+					}
+				}
+			}
+		'
 }
-# ====== 関数の設定ここまで ======
 
-
-# ====== メイン処理 ======
-# 使用するAPIに応じて書籍情報を取得
+# 指定APIに応じて書誌情報を取得
 case "${api}" in
-
 	openbd)
 		result="$(fetch_openbd "${isbn}")"
 		;;
-
 	ndl)
 		result="$(fetch_ndl "${isbn}")"
 		;;
-
 esac
 
-# 結果が空かつフォールバックが有効な場合
+# 結果が空でフォールバック有効時は別APIを試す
 if [ -z "${result}" ] && [ "${fallback_enabled}" -eq 1 ]; then
 
 	case "${api}" in
-
 		openbd)
 			result="$(fetch_ndl "${isbn}")"
 			;;
 		ndl)
 			result="$(fetch_openbd "${isbn}")"
 			;;
-
 	esac
 
 fi
 
-# 結果を出力またはエラー処理
+# 最終結果が空ならエラー終了
 if [ -z "${result}" ]; then
 
 	echo "Error: No data found for ISBN: ${isbn}" >&2
 	exit 1
 
-else
-
-	echo "${result}"
-
 fi
-# ====== メイン処理ここまで ======
+
+# 取得結果を出力
+echo "${result}"
+

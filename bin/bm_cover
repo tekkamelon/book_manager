@@ -1,175 +1,244 @@
 #!/bin/sh
 
-# 環境変数設定
+set -eu
+
+# 文字コード系の挙動を固定
 export LC_ALL=C
 export LANG=C
 export POSIXLY_CORRECT=1
 
-set -eu
-
-# 変数を初期化
+# 使用APIの初期値を設定
 api="openbd"
+
+# フォールバックの有効/無効を保持
 fallback_enabled=0
+
+# isbn_checker未導入時の強制実行フラグを保持
+force_without_checker=0
+
+# 利用ダウンローダを保持
 downloader=""
 
-# ダウンローダ検出
+# wgetの有無を確認
 if command -v wget >/dev/null 2>&1; then
+
+	# wgetを利用
 	downloader="wget"
+
+# curlの有無を確認
 elif command -v curl >/dev/null 2>&1; then
+
+	# curlを利用
 	downloader="curl"
+
 else
+
+	# ダウンローダ未導入時はエラー終了
 	echo 'Error: please install "wget" or "curl"' >&2
 	exit 1
+
 fi
 
-# 引数解析
+# ISBN入力値を初期化
 isbn=""
 
-# 引数がある場合にループ
+# コマンドライン引数を順に処理
 while [ "${#}" -gt 0 ]; do
-
-	# 引数の内容に応じて処理
 	case "${1}" in
-		-o) api="openbd"; shift ;;
-		-g) api="google"; shift ;;
-		-f) fallback_enabled=1; shift ;;
+		-o)
+			# openBDを選択
+			api="openbd"
+			shift
+			;;
+		-g)
+			# Google Books APIを選択
+			api="google"
+			shift
+			;;
+		-f)
+			# フォールバックを有効化
+			fallback_enabled=1
+			shift
+			;;
+		-F)
+			# isbn_checker未導入時でも続行可能に
+			force_without_checker=1
+			shift
+			;;
 		-h)
-			cat <<- 'EOF'
+			# ヘルプを表示
+			cat <<- 'EOF_HELP'
 			Usage: bm_cover [options] <ISBN>
 
 			Options:
 			  -o        Use openBD (default)
 			  -g        Use Google Books API
 			  -f        Enable fallback to the other API if no result
+			  -F        Force run even if isbn_checker is not available
 			  -h        Show this help message and exit
-
-			Examples:
-			  bm_cover -o 9784839961451
-			  echo 9784839961451 | bm_cover -g
-			EOF
+			EOF_HELP
 			exit 0
 			;;
 		-*)
+			# 不明なオプションはエラー終了
 			echo "Error: Unknown option: $1" >&2
 			exit 1
 			;;
 		[0-9]*)
+			# ISBN引数の重複指定を検出
 			if [ -z "${isbn}" ]; then
+				# ISBNを保持
 				isbn="${1}"
 			else
+				# ISBNが複数指定されたためエラー終了
 				echo "Error: Multiple ISBNs provided" >&2
 				exit 1
 			fi
 			shift
 			;;
 		*)
+			# 不正な引数はエラー終了
 			echo "Error: Invalid argument: ${1}" >&2
 			exit 1
 			;;
 	esac
-
 done
 
-# ISBN入力確認
+# パイプ入力の有無を確認
 if [ -p /dev/stdin ]; then
 
+	# パイプ入力からISBNを読み込む
 	read -r isbn < /dev/stdin
 
+# 引数でも標準入力でもISBNが未指定か確認
 elif [ -z "${isbn}" ]; then
 
+	# ISBN未指定時はエラー終了
 	echo "Error: ISBN not provided" >&2
 	exit 1
 
 fi
 
-# ISBN形式検証(数字のみ、10桁または13桁)
+# ISBNが数字のみか確認
 case "${isbn}" in
+
 	*[!0-9]*)
+		# 数字以外が含まれる場合はエラー終了
 		echo "Error: ISBN must contain digits only" >&2
 		exit 1
 		;;
+
 esac
 
-isbn_len="$(printf '%s' "${isbn}" | wc -c | tr -d '[:space:]')"
+# isbn_checkerコマンドの存在を確認
+if command -v isbn_checker >/dev/null 2>&1; then
 
-if [ "${isbn_len}" -ne 10 ] && [ "${isbn_len}" -ne 13 ]; then
+	# isbn_checkerで検算を実施
+	if ! printf '%s\n' "${isbn}" | isbn_checker >/dev/null; then
 
-	echo "Error: ISBN must be 10 or 13 digits" >&2
-	exit 1
+		# 検算失敗時はエラー終了
+		echo "Error: ISBN checksum validation failed" >&2
+		exit 1
+
+	fi
+
+else
+
+	# 強制実行オプション未指定ならエラー終了
+	if [ "${force_without_checker}" -ne 1 ]; then
+
+		echo 'Error: isbn_checker not found in PATH. Use -F to force run without checksum check.' >&2
+		exit 1
+
+	fi
 
 fi
 
-# ====== 関数の設定 ======
-# データを取得する関数
+# 指定URLからデータを取得
 fetch_data() {
 
+	# 取得対象URLを受け取る
 	url="${1}"
+
+	# 利用可能なダウンローダで取得
 	case "${downloader}" in
 		wget)
+			# wgetでデータ取得を試みる
 			if ! wget -q -O - -- "${url}" 2>/dev/null; then
+
+				# 取得失敗時はエラー終了
 				echo 'Error: Failed to fetch data from URL' >&2
 				exit 1
+
 			fi
 			;;
 		curl)
+			# curlでデータ取得を試みる
 			if ! curl -L -s -- "${url}" 2>/dev/null; then
+
+				# 取得失敗時はエラー終了
 				echo 'Error: Failed to fetch data from URL' >&2
 				exit 1
+
 			fi
 			;;
 		*)
+			# 想定外のダウンローダ状態はエラー終了
 			echo 'Error: No available downloader' >&2
 			exit 1
 			;;
-
-	esac
+		esac
 
 }
 
-# openBDから書影URLを取得する関数
+# openBDから書影URLを取得
 fetch_openbd_cover() {
 
-	isbn_val="${1}"
-	url="https://api.openbd.jp/v1/get?isbn=${isbn_val}"
+	# API URLを構築
+	url="https://api.openbd.jp/v1/get?isbn=${1}"
 
+	# JSONからResourceLinkを抽出
 	fetch_data "${url}" |
-	tr -d '\n' |
-	grep -o '"ResourceLink":"[^"]*"' |
-	head -1 |
-	sed 's/"ResourceLink":"\([^"]*\)"/\1/'
+		tr -d "\n" |
+		grep -o '"ResourceLink":"[^"]*"' |
+		head -1 |
+		sed 's/"ResourceLink":"\([^"]*\)"/\1/'
 
 }
 
-# Google Booksから書影URLを取得する関数
+# Google Books APIから書影URLを取得
 fetch_google_cover() {
 
-	isbn_val="${1}"
-	url="https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn_val}"
+	# API URLを構築
+	url="https://www.googleapis.com/books/v1/volumes?q=isbn:${1}"
 
+	# JSONからthumbnailを抽出
 	fetch_data "${url}" |
-	tr -d '\n' |
-	grep -o '"thumbnail":"[^"]*"' |
-	head -1 |
-	sed 's/"thumbnail":"\([^"]*\)"/\1/'
+		tr -d "\n" |
+		grep -o '"thumbnail":"[^"]*"' |
+		head -1 |
+		sed 's/"thumbnail":"\([^"]*\)"/\1/'
 
 }
-# ====== 関数の設定ここまで ======
 
-
-# ====== メイン処理 ======
-# 使用するAPIに応じて書影URLを取得
+# 取得結果を初期化
 result=""
+
+# 指定APIに応じて書影URLを取得
 case "${api}" in
+
 	openbd)
 		result="$(fetch_openbd_cover "${isbn}")"
 		;;
 	google)
 		result="$(fetch_google_cover "${isbn}")"
 		;;
+
 esac
 
-# 結果が空かつフォールバックが有効な場合
+# 結果が空でフォールバック有効時は別APIを試す
 if [ -z "${result}" ] && [ "${fallback_enabled}" -eq 1 ]; then
+
 	case "${api}" in
 		openbd)
 			result="$(fetch_google_cover "${isbn}")"
@@ -178,13 +247,17 @@ if [ -z "${result}" ] && [ "${fallback_enabled}" -eq 1 ]; then
 			result="$(fetch_openbd_cover "${isbn}")"
 			;;
 	esac
+
 fi
 
-# 結果を出力またはエラー処理
+# 最終結果が空ならエラー終了
 if [ -z "${result}" ]; then
+
 	echo "Error: No cover image found for ISBN: ${isbn}" >&2
 	exit 1
-else
-	echo "${result}"
+
 fi
-# ====== メイン処理ここまで ======
+
+# 取得結果を出力
+echo "${result}"
+
