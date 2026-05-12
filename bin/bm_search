@@ -39,6 +39,19 @@ else
 
 fi
 
+# parsrx.shの存在を確認
+if ! command -v parsrx.sh >/dev/null 2>&1; then
+
+	# parsrx.shがPATHに無ければエラー終了
+	cat <<-'EOF_PARSRS_ERROR' >&2
+	Error: parsrx.sh not found in PATH.
+	Please download and install from:
+		https://github.com/ShellShoccar-jpn/Parsrs/blob/master/parsrx.sh
+	EOF_PARSRS_ERROR
+	exit 1
+
+fi
+
 # ISBN入力値を初期化
 isbn=""
 
