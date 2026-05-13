@@ -230,6 +230,12 @@ tr:nth-child(even) {
 	background: var(--bg-secondary);
 }
 
+/* 横スクロール可能なテーブルコンテナ */
+.scroll-table {
+	width: 100%;
+	overflow-x: auto;
+}
+
 /* リンクのスタイル */
 a {
 	color: var(--accent);

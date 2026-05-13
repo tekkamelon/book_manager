@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>蔵書一覧 - Book Manager</title>
+	<link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+	<div class="container">
+		<h1>蔵書一覧</h1>
+
+		<nav>
+			<a href="index.html">トップ</a>
+			<a href="search.html">蔵書検索</a>
+			<a href="list.html">蔵書一覧</a>
+			<a href="add.html">書籍追加・データ検索</a>
+			<a href="confirm.html">編集(code-server)</a>
+			<a href="settings.html">設定</a>
+		</nav>
+
+		<div class="card">
+			<p><a href="../cgi-bin/list.cgi">CGI直接表示</a></p>
+			<div id="result" class="scroll-table">
+				<p>データを読み込んでいます...</p>
+			</div>
+		</div>
+	</div>
+
+	<script src="../js/settings.js"></script>
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			fetch('../cgi-bin/list.cgi')
+				.then(function (response) {
+					if (!response.ok) {
+						throw new Error('HTTP status ' + response.status);
+					}
+					return response.text();
+				})
+				.then(function (html) {
+					document.getElementById('result').innerHTML = html;
+				})
+				.catch(function (error) {
+					document.getElementById('result').innerHTML =
+						'<p class="result">読み込みに失敗しました: ' + error.message + '</p>';
+				});
+		});
+	</script>
+</body>
+
+</html>
