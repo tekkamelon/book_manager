@@ -28,60 +28,7 @@ csv_file=""
 
 
 # ====== 関数の宣言 ======
-# 引数で受け取った文字列のHTML特殊文字をエスケープする
-html_escape() {
-	printf '%s' "${1}" \
-		| sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g'
-}
-
-# c2hコマンドが利用できない場合のテーブル描画処理
-# CSVを手動でHTMLテーブルに変換する
-render_table_fallback() {
-
-	# 最初の行はヘッダーとして処理するフラグ
-	first_line=1
-
-	printf '%s\n' '<div class="scroll-table">'
-	printf '%s\n' '<table>'
-
-	# CSVファイルを1行ずつ読み込む
-	while IFS= read -r line || [ -n "${line}" ]; do
-
-		escaped_line=$(html_escape "${line}")
-		printf '%s\n' '<tr>'
-
-		if [ "${first_line}" -eq 1 ]; then
-
-			# ヘッダー行をth要素として描画する
-			printf '%s\n' "${escaped_line}" |
-
-			awk -F',' '{for(i=1;i<=NF;i++) printf "<th>%s</th>\n", $i}'
-			first_line=0
-
-		else
-
-			# データ行をtd要素として描画する
-			printf '%s\n' "${escaped_line}" |
-
-			awk -F',' '{for(i=1;i<=NF;i++) printf "<td>%s</td>\n", $i}'
-
-		fi
-
-		printf '%s\n' '</tr>'
-
-	# CSVファイルを標準入力として渡す
-	done < "${csv_file}"
-
-	printf '%s\n' '</table>'
-	printf '%s\n' '</div>'
-
-}
-# ====== 関数の宣言ここまで ======
-
-
 # CSVデータをHTMLテーブルとして描画する
-# c2hコマンドが利用可能な場合はそちらを使用し、
-# ない場合はフォールバック処理を実行する
 render_csv_table() {
 
 	# CSVファイルの存在を確認する
@@ -115,10 +62,9 @@ render_csv_table() {
 
 	fi
 
-	# c2hがない場合はフォールバック処理を実行する
-	render_table_fallback
-
 }
+# ====== 関数の宣言ここまで ======
+
 
 # HTTPヘッダーを出力する
 echo "Content-Type: text/html; charset=UTF-8"
