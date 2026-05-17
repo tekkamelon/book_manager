@@ -9,6 +9,12 @@ export LC_ALL=C
 export LANG=C
 export POSIXLY_CORRECT=1
 
+# スクリプトの配置ディレクトリを取得する
+script_dir=$(CDPATH="" cd -- "$(dirname "$0")" && pwd)
+
+# プロジェクト固有のツールを含むbinディレクトリをPATHに追加する
+export PATH="${script_dir}/../bin:${PATH}"
+
 # 変数を初期化
 csv_file=""
 isbn=""
@@ -20,9 +26,7 @@ config_file="../book_manager.conf"
 # 設定ファイルから変数を読み込み
 . ${config_file}
 
-# 独自コマンドにパスを通す
-export PATH="../bin:${PATH}"
-
+# POSTリクエストでコンテンツ長があるかを確認
 if [ "${REQUEST_METHOD:-GET}" = "POST" ] && [ -n "${CONTENT_LENGTH:-}" ]; then
 
 	# POSTデータを変数に代入
@@ -65,7 +69,7 @@ post_proc(){
 
 if [ -z "${data}" ]; then
 
-		safe_isbn=$(printf '%s' "${isbn}" | sed 's/&/\&/g;s/</\</g;s/>/\>/g')
+		safe_isbn=$(printf '%s' "${isbn}" | sed 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g')
 		printf '<p class="result">書籍情報が見つかりませんでした: %s</p>\n' "${safe_isbn}"
 		printf '<p><a href="../html/google_search.html?isbn=%s" class="button">Google で検索</a></p>\n' "${safe_isbn}"
 
@@ -78,10 +82,10 @@ if [ -z "${data}" ]; then
 			if [ "${add_to_csv}" = "yes" ]; then
 
 				echo "${last_line}" >> "${csv_file}"
-				printf '<p class="result">成功: %s を追加しました</p>\n' "$(printf '%s' "${isbn}" | sed 's/&/\&amp;/g;s/</\</g;s/>/\>/g')"
+				printf '<p class="result">成功: %s を追加しました</p>\n' "$(printf '%s' "${isbn}" | sed 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g')"
 			else
 
-				printf '<p class="result">成功: %s の情報を取得しました(CSV追加なし)</p>\n' "$(printf '%s' "${isbn}" | sed 's/&/\&amp;/g;s/</\</g;s/>/\>/g')"
+				printf '<p class="result">成功: %s の情報を取得しました(CSV追加なし)</p>\n' "$(printf '%s' "${isbn}" | sed 's/&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g')"
 
 			fi
 
@@ -133,4 +137,3 @@ cat << EOF
 </html>
 EOF
 # HTMLここまで
-

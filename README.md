@@ -229,3 +229,7 @@ python3 cgi_server.py
 
 	- https://github.com/ShellShoccar-jpn/misc-tools
 
+- parsrx.sh
+
+	- https://github.com/ShellShoccar-jpn/Parsrs/blob/master/parsrx.sh
+
