@@ -9,8 +9,8 @@ export LC_ALL=C
 export LANG=C
 export POSIXLY_CORRECT=1
 
-# 設定ファイルのパス
-config_file="../book_manager.conf"
+# 設定ファイルのパス (スクリプトの場所からの相対パスで解決)
+config_file="$(dirname "$0")/../book_manager.conf"
 
 # 独自コマンドにパスを通す
 export PATH="../bin:${PATH}"

@@ -5,3 +5,5 @@ package.json
 package-lock.json
 test-results/
 .playwright-mcp/
+playwright-report/
+playwright/.cache/
