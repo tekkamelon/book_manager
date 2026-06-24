@@ -1,65 +1,36 @@
+// 設定APIからJSONデータを取得する共通関数
+function fetchSettings() {
+	return fetch('../cgi-bin/api/settings.cgi')
+		.then(response => {
+			if (!response.ok) {
+				throw new Error('HTTP error! status: ' + response.status);
+			}
+			return response.json();
+		});
+}
+
 // 設定ファイルからcsv_fileの値を読み込む共通関数
 function loadCsvFilePath(elementId, successPrefix, errorMessage) {
-	// CGIスクリプトから設定データを取得
-	fetch('../cgi-bin/settings.cgi')
-		.then(response => response.text())
-		.then(html => {
-			// HTMLをパースして現在のcsv_file値を抽出
-			const parser = new DOMParser();
-			const doc = parser.parseFromString(html, 'text/html');
-			const preElement = doc.querySelector('pre');
-
-			if (preElement) {
-				const text = preElement.textContent;
-				// 正規表現でcsv_fileの値を抽出
-				const match = text.match(/csv_file=([^\n]+)/);
-				if (match) {
-					const currentPath = match[1].replace(/&quot;/g, '"');
-					document.getElementById(elementId).textContent = `${successPrefix}${currentPath}`;
-					return currentPath;
-				}
+	fetchSettings()
+		.then(data => {
+			if (data.csv_file) {
+				document.getElementById(elementId).textContent = successPrefix + data.csv_file;
+			} else {
+				document.getElementById(elementId).textContent = successPrefix + 'なし';
 			}
-			document.getElementById(elementId).textContent = `${successPrefix}なし`;
-			return null;
 		})
 		.catch(error => {
-			// エラーが発生した場合の処理
 			console.error(errorMessage, error);
-			document.getElementById(elementId).textContent = `${successPrefix}読み込み失敗`;
-			return null;
+			document.getElementById(elementId).textContent = successPrefix + '読み込み失敗';
 		});
 }
 
 // 設定ファイルからcode-serverの値を読み込む関数
 function loadCodeServerUrl(callback) {
-	console.log('code-server URLを読み込み開始');
-	fetch('../cgi-bin/settings.cgi')
-		.then(response => {
-			console.log('CGIレスポンス受信:', response.status);
-			return response.text();
-		})
-		.then(html => {
-			console.log('受信したHTML:', html.substring(0, 200));
-			const parser = new DOMParser();
-			const doc = parser.parseFromString(html, 'text/html');
-			const preElement = doc.querySelector('pre');
-
-			if (preElement) {
-			const text = preElement.textContent;
-			console.log('pre要素の内容:', text);
-			const match = text.match(/code_server=([^\n]+)/);
-			if (match) {
-				let url = match[1].replace(/&quot;/g, '"');
-				url = url.replace(/^"|"$/g, '');
-				console.log('抽出したURL:', url);
-				callback(url);
-				return;
-			}
-			console.log('code-serverが見つかりませんでした');
-		} else {
-				console.log('pre要素が見つかりませんでした');
-			}
-			callback(null);
+	fetchSettings()
+		.then(data => {
+			const url = data.code_server || null;
+			callback(url);
 		})
 		.catch(error => {
 			console.error('code-serverの読み込みに失敗しました:', error);
@@ -69,62 +40,34 @@ function loadCodeServerUrl(callback) {
 
 // 設定ファイルからcsv_fileの値を読み込んでinput要素に設定する関数
 function loadCsvFilePathToInput(inputId, labelId) {
-	fetch('../cgi-bin/settings.cgi')
-		.then(response => response.text())
-		.then(html => {
-			// HTMLから現在のcsv_file値を抽出
-			const parser = new DOMParser();
-			const doc = parser.parseFromString(html, 'text/html');
-			const preElement = doc.querySelector('pre');
-
-			if (preElement) {
-				const text = preElement.textContent;
-				// 正規表現でcsv_fileの値を抽出
-				const match = text.match(/csv_file=([^\n]+)/);
-				if (match) {
-					const currentPath = match[1].replace(/&quot;/g, '"');
-					document.getElementById(inputId).value = currentPath;
-					document.getElementById(labelId).textContent = `現在の設定: ${currentPath}`;
-					return currentPath;
-				}
+	fetchSettings()
+		.then(data => {
+			if (data.csv_file) {
+				document.getElementById(inputId).value = data.csv_file;
+				document.getElementById(labelId).textContent = '現在の設定: ' + data.csv_file;
+			} else {
+				document.getElementById(labelId).textContent = '現在の設定: なし';
 			}
-			document.getElementById(labelId).textContent = '現在の設定: なし';
-			return null;
 		})
 		.catch(error => {
-			// エラーが発生した場合の処理
 			console.error('設定の読み込みに失敗しました:', error);
 			document.getElementById(labelId).textContent = '現在の設定: 読み込み失敗';
-			return null;
 		});
 }
 
 // 設定ファイルからcode-serverの値を読み込んでinput要素に設定する関数
 function loadCodeServerUrlToInput(inputId, labelId) {
-	fetch('../cgi-bin/settings.cgi')
-		.then(response => response.text())
-		.then(html => {
-			const parser = new DOMParser();
-			const doc = parser.parseFromString(html, 'text/html');
-			const preElement = doc.querySelector('pre');
-
-			if (preElement) {
-			const text = preElement.textContent;
-			const match = text.match(/code_server=([^\n]+)/);
-			if (match) {
-				let url = match[1].replace(/&quot;/g, '"');
-				url = url.replace(/^"|"$/g, '');
-				document.getElementById(inputId).value = url;
-				document.getElementById(labelId).textContent = `現在の設定: ${url}`;
-				return url;
+	fetchSettings()
+		.then(data => {
+			if (data.code_server) {
+				document.getElementById(inputId).value = data.code_server;
+				document.getElementById(labelId).textContent = '現在の設定: ' + data.code_server;
+			} else {
+				document.getElementById(labelId).textContent = '現在の設定: なし';
 			}
-		}
-			document.getElementById(labelId).textContent = '現在の設定: なし';
-			return null;
 		})
 		.catch(error => {
 			console.error('code-serverの読み込みに失敗しました:', error);
 			document.getElementById(labelId).textContent = '現在の設定: 読み込み失敗';
-			return null;
 		});
 }

@@ -17,53 +17,15 @@
     <div id="result">待機中...</div>
     <div id="log">ログがここに表示されます...</div>
 
+    <script src="../js/settings.js"></script>
     <script>
     const logDiv = document.getElementById('log');
     const resultDiv = document.getElementById('result');
 
     function log(message) {
         const timestamp = new Date().toLocaleTimeString();
-        logDiv.textContent += `[${timestamp}] ${message}\n`;
+        logDiv.textContent += '[' + timestamp + '] ' + message + '\n';
         console.log(message);
-    }
-
-    function loadCodeServerUrl(callback) {
-        log('code-server URLを読み込み開始');
-        fetch('../cgi-bin/settings.cgi')
-            .then(response => {
-                log('CGIレスポンス受信: ' + response.status + ' ' + response.statusText);
-                if (!response.ok) {
-                    throw new Error('HTTP ' + response.status);
-                }
-                return response.text();
-            })
-            .then(html => {
-                log('受信したHTML (先頭200文字): ' + html.substring(0, 200));
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-                const preElement = doc.querySelector('pre');
-
-                if (preElement) {
-                    const text = preElement.textContent;
-                    log('pre要素の内容:\n' + text);
-                    const match = text.match(/code-server=([^\n]+)/);
-                    if (match) {
-                        const url = match[1].replace(/&quot;/g, '"');
-                        log('抽出したURL: ' + url);
-                        callback(url);
-                        return;
-                    }
-                    log('code-serverが見つかりませんでした');
-                } else {
-                    log('pre要素が見つかりませんでした');
-                }
-                callback(null);
-            })
-            .catch(error => {
-                log('code-serverの読み込みに失敗しました: ' + error.message);
-                console.error('code-serverの読み込みに失敗しました:', error);
-                callback(null);
-            });
     }
 
     document.addEventListener('DOMContentLoaded', function () {
