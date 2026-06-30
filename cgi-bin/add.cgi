@@ -21,7 +21,7 @@ isbn=""
 add_to_csv="no"
 
 # 設定ファイルのパス
-config_file="../book_manager.conf"
+config_file="$(dirname "$0")/../book_manager.conf"
 
 # 設定ファイルから変数を読み込み
 . ${config_file}

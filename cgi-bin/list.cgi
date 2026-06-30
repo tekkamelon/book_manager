@@ -9,14 +9,11 @@ export LC_ALL=C
 export LANG=C
 export POSIXLY_CORRECT=1
 
-# スクリプトの配置ディレクトリを取得する
-script_dir=$(CDPATH="" cd -- "$(dirname "$0")" && pwd)
-
 # プロジェクト固有のツールを含むbinディレクトリをPATHに追加する
-export PATH="${script_dir}/../bin:${PATH}"
+export PATH="$(dirname "$0")/../bin:${PATH}"
 
 # 設定ファイルのパスを定義する
-config_file="${script_dir}/../book_manager.conf"
+config_file="$(dirname "$0")/../book_manager.conf"
 
 # CSVファイルのパスは設定ファイルから読み込まれる
 csv_file=""
