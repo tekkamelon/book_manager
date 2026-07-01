@@ -10,7 +10,9 @@ export LANG=C
 export POSIXLY_CORRECT=1
 
 # プロジェクト固有のツールを含むbinディレクトリをPATHに追加する
-export PATH="$(dirname "$0")/../bin:${PATH}"
+project_bin="$(cd -- "$(dirname "$0")/../bin" && pwd)"
+PATH="${project_bin}:${PATH}"
+export PATH
 
 # 設定ファイルのパスを定義する
 config_file="$(dirname "$0")/../book_manager.conf"

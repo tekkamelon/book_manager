@@ -24,7 +24,7 @@ add_to_csv="no"
 config_file="$(dirname "$0")/../book_manager.conf"
 
 # 設定ファイルから変数を読み込み
-. ${config_file}
+. "${config_file}"
 
 # POSTリクエストでコンテンツ長があるかを確認
 if [ "${REQUEST_METHOD:-GET}" = "POST" ] && [ -n "${CONTENT_LENGTH:-}" ]; then
