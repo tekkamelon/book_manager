@@ -64,28 +64,66 @@ h3 {
 	color: var(--text-secondary);
 }
 
-/* ナビゲーションバーのスタイル */
+/* ナビゲーションバー(ブラウザタブ風) */
 nav {
-	margin-bottom: 2rem;
-	padding: 1rem 0;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	gap: 0.2rem;
+	margin: 0;
+	padding: 0.35rem 0.25rem 0;
 	border-bottom: 1px solid var(--border);
+	background: var(--bg-secondary);
+	border-radius: 10px 10px 0 0;
 }
 
-/* ナビゲーションリンクのスタイル */
+/* ナビゲーションリンク(非選択タブ) */
 nav a {
-	color: var(--accent);
+	position: relative;
+	top: 1px;
+	display: inline-block;
+	color: var(--text-secondary);
 	text-decoration: none;
-	margin: 0 0.8rem;
-	padding: 0.4rem 0.8rem;
-	border-radius: 4px;
-	transition: all 0.2s ease;
+	margin: 0;
+	padding: 0.5rem 1rem 0.55rem;
+	border: 1px solid transparent;
+	border-bottom: none;
+	border-radius: 8px 8px 0 0;
+	background: transparent;
+	white-space: nowrap;
+	transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
-/* ナビゲーションリンクのホバー時スタイル */
+/* 非選択タブのホバー */
 nav a:hover {
-	color: var(--bg-primary);
-	background-color: var(--accent);
+	color: var(--accent);
+	background-color: var(--bg-card);
 	text-decoration: none;
+}
+
+/* 選択中タブ(現在のページ) */
+nav a[aria-current="page"] {
+	color: var(--accent);
+	background-color: var(--bg-card);
+	border-color: var(--border);
+	font-weight: 600;
+}
+
+/* 選択中タブの下線を消して内容領域とつなげる */
+nav a[aria-current="page"]::after {
+	content: "";
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: -1px;
+	height: 2px;
+	background: var(--bg-card);
+}
+
+/* タブの直下にあるカードをタブバーと接続する */
+nav + .card {
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
 }
 
 /* カードコンポーネントのスタイル */
@@ -338,5 +376,15 @@ footer p {
 
 	h1 {
 		font-size: 1.8rem;
+	}
+
+	nav {
+		flex-wrap: nowrap;
+		overflow-x: auto;
+	}
+
+	nav a {
+		padding: 0.45rem 0.75rem 0.5rem;
+		font-size: 0.9rem;
 	}
 }

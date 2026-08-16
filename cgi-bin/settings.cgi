@@ -132,7 +132,7 @@ cat << EOF
         <a href="../html/index.html">トップ</a>
         <a href="../html/search.html">蔵書検索</a>
         <a href="../html/add.html">書籍追加・データ検索</a>
-        <a href="../html/settings.html">設定ページ</a>
+        <a href="../html/settings.html" aria-current="page">設定ページ</a>
         <a href="../html/confirm.html">外部リンクの確認</a>
 		<a href="../html/confirm.html">編集</a>
     </nav>
