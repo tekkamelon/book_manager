@@ -205,12 +205,14 @@ python3 cgi_server.py
 
 #### HTMLファイル
 - **html/index.html** - メインメニュー画面
-- **html/search.html** - 蔵書検索フォーム
+- **html/list.html** - 蔵書一覧画面(検索機能統合済み)
+- **html/search.html** - 蔵書検索フォーム(非推奨: 蔵書一覧ページの検索機能に統合)
 - **html/add.html** - 書籍追加・データ検索フォーム
 - **html/settings.html** - 設定画面
 
 #### CGIスクリプト
-- **cgi-bin/search.cgi** - 蔵書検索処理
+- **cgi-bin/list.cgi** - 蔵書一覧表示処理
+- **cgi-bin/search.cgi** - 蔵書検索処理(非推奨)
 - **cgi-bin/add.cgi** - 書籍追加処理
 - **cgi-bin/settings.cgi** - 設定保存/読込処理
 
@@ -219,7 +221,7 @@ python3 cgi_server.py
 - **css/style.css** - スタイルシート(ライト/ダークモード対応)
 
 ### 機能
-- 蔵書検索 - CSVファイル内を検索
+- 蔵書一覧 - CSVファイルの一覧表示と絞り込み検索(クライアントサイド)
 - 書籍追加 - ISBNから書籍情報を取得しCSVに追加
 - 設定変更 - CSVファイルパスの設定
 

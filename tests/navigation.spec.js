@@ -2,7 +2,6 @@
 const { test, expect } = require('@playwright/test');
 
 const pages = [
-	{ path: '/html/search.html', label: '蔵書検索' },
 	{ path: '/html/list.html', label: '蔵書一覧' },
 	{ path: '/html/add.html', label: '書籍追加・データ検索' },
 	{ path: '/html/confirm.html', label: '編集' },
@@ -40,7 +39,7 @@ test.describe('ナビゲーションのタブハイライト', () => {
 	}
 
 	test('非選択タブをクリックすると対応ページへ遷移する', async ({ page }) => {
-		await page.goto('/html/search.html');
+		await page.goto('/html/add.html');
 		await page.getByRole('navigation').getByRole('link', { name: '蔵書一覧' }).click();
 		await expect(page).toHaveURL(/list\.html/);
 		await expect(page.locator('body > .container > nav a[aria-current="page"]')).toHaveText('蔵書一覧');
