@@ -23,6 +23,16 @@
 
 		<div class="card">
 			<p><a href="../cgi-bin/list.cgi">CGI直接表示</a></p>
+			<form id="search-form" role="search">
+				<div class="form-group">
+					<label for="q">検索ワード</label>
+					<input type="search" id="q" name="q">
+				</div>
+				<p>
+					<input type="submit" value="検索">
+				</p>
+			</form>
+
 			<div id="result" class="scroll-table">
 				<p>データを読み込んでいます...</p>
 			</div>
