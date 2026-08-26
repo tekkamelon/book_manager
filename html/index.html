@@ -11,13 +11,49 @@
 <body>
 	<div class="container">
 		<h1>Book Manager</h1>
+		<p class="page-intro">蔵書を検索・追加・管理します。</p>
+
+		<nav>
+			<a href="index.html" aria-current="page">トップ</a>
+			<a href="list.html">蔵書一覧</a>
+			<a href="add.html">書籍追加・データ検索</a>
+			<a href="confirm.html">編集</a>
+			<a href="settings.html">設定</a>
+		</nav>
 
 		<div class="card">
-			<div class="button-group">
-				<button onclick="location.href='list.html'">蔵書一覧</button>
-				<button onclick="location.href='add.html'">書籍追加・データ検索</button>
-				<button id="helpButton">編集(code-server)</button>
-				<button onclick="location.href='settings.html'">設定</button>
+			<div class="feature-list">
+				<section class="feature-item">
+					<div>
+						<h2>蔵書一覧</h2>
+						<p>登録済みの書籍を検索・確認します。</p>
+					</div>
+					<a class="button" href="list.html">開く</a>
+				</section>
+
+				<section class="feature-item">
+					<div>
+						<h2>書籍追加・データ検索</h2>
+						<p>ISBNから書籍情報を取得し、蔵書へ追加します。</p>
+					</div>
+					<a class="button" href="add.html">開く</a>
+				</section>
+
+				<div class="editor-link">
+					<div>
+						<h2>編集環境</h2>
+						<p>code-serverで設定ファイルを編集します。</p>
+					</div>
+					<button id="helpButton" type="button">開く</button>
+				</div>
+
+				<section class="feature-item">
+					<div>
+						<h2>設定</h2>
+						<p>CSVファイルとcode-serverの接続先を設定します。</p>
+					</div>
+					<a class="button" href="settings.html">開く</a>
+				</section>
 			</div>
 		</div>
 

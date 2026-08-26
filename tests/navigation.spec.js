@@ -2,6 +2,7 @@
 const { test, expect } = require('@playwright/test');
 
 const pages = [
+	{ path: '/html/index.html', label: 'トップ' },
 	{ path: '/html/list.html', label: '蔵書一覧' },
 	{ path: '/html/add.html', label: '書籍追加・データ検索' },
 	{ path: '/html/confirm.html', label: '編集' },
