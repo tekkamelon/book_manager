@@ -1,14 +1,22 @@
 document.addEventListener('DOMContentLoaded', function () {
-	document.getElementById('helpButton').addEventListener('click', function () {
-		console.log('ボタンがクリックされました');
+	const helpButton = document.getElementById('helpButton');
+	const editorStatus = document.getElementById('editorStatus');
+
+	helpButton.addEventListener('click', function () {
 		loadCodeServerUrl(function (url) {
-			console.log('URL読み込み完了:', url);
 			if (url) {
-				console.log('クッションページにリダイレクトします:', url);
 				location.href = 'confirm.html?url=' + encodeURIComponent(url);
-			} else {
-				alert('code-serverのURLが設定されておりません');
+				return;
 			}
+
+			editorStatus.hidden = false;
+			editorStatus.replaceChildren(
+			'code-serverのURLが設定されていません。',
+			Object.assign(document.createElement('a'), {
+				href: 'settings.html',
+				textContent: '設定画面で登録してください。',
+			})
+			);
 		});
 	});
 });

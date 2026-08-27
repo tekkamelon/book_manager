@@ -46,7 +46,7 @@ h1 {
 	font-size: 2.2rem;
 	font-weight: 600;
 	color: var(--accent);
-	margin-bottom: 2rem;
+	margin: 0;
 	text-align: center;
 	letter-spacing: 0.05em;
 }
@@ -138,7 +138,7 @@ nav + .card {
 
 /* トップページの導入文 */
 .page-intro {
-	margin: -1.2rem 0 2rem;
+	margin: 0.4rem 0 2rem;
 	color: var(--text-secondary);
 	text-align: center;
 }
@@ -147,11 +147,25 @@ nav + .card {
 .feature-list {
 	display: flex;
 	flex-direction: column;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+/* トップページの区分見出し */
+.section-heading {
+	margin: 0 0 0.5rem;
+	font-size: 1rem;
+	color: var(--text-secondary);
+}
+
+/* トップページの管理操作 */
+.management-actions {
+	margin-top: 2rem;
 }
 
 /* トップページの機能項目 */
-.feature-item,
-.editor-link {
+.feature-item {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -165,15 +179,32 @@ nav + .card {
 }
 
 /* 機能項目の見出し */
-.feature-item h2,
-.editor-link h2 {
+.feature-item h3 {
 	margin: 0;
+	color: var(--accent);
 }
 
 /* 機能項目の説明 */
-.feature-item p,
-.editor-link p {
+.feature-item p {
 	margin: 0.3rem 0 0;
+	color: var(--text-secondary);
+}
+
+/* 機能項目全体を操作できるリンク */
+.feature-link {
+	flex: 1;
+	color: inherit;
+	text-decoration: none;
+}
+
+.feature-link:hover h3 {
+	color: var(--accent-hover);
+	text-decoration: underline;
+}
+
+/* 編集環境の案内 */
+.editor-status {
+	margin: 1rem 0 0;
 	color: var(--text-secondary);
 }
 
@@ -210,16 +241,32 @@ input[type="submit"]:hover,
 
 /* ボタンのアクティブ時スタイル */
 button:active,
-input[type="submit"]:active {
+input[type="submit"]:active,
+.button:active {
 	transform: translateY(0);
 	box-shadow: 0 1px 4px var(--shadow);
 }
 
-/* ボタンのフォーカス時スタイル */
-button:focus,
-input[type="submit"]:focus {
+/* 操作要素のフォーカス時スタイル */
+button:focus-visible,
+input[type="submit"]:focus-visible,
+.button:focus-visible,
+.feature-link:focus-visible,
+nav a:focus-visible {
 	outline: 2px solid var(--accent);
 	outline-offset: 3px;
+}
+
+/* 管理操作用の控えめなボタン */
+.button--secondary {
+	background: var(--bg-secondary);
+	color: var(--text-primary);
+	border: 1px solid var(--border);
+}
+
+.button--secondary:hover {
+	background: var(--bg-primary);
+	color: var(--accent-hover);
 }
 
 /* フォームのスタイル */
@@ -395,6 +442,12 @@ footer {
 	color: var(--text-secondary);
 }
 
+footer h2 {
+	margin: 0;
+	font-size: 1.1rem;
+	color: var(--text-secondary);
+}
+
 /* フッター内の段落のスタイル */
 footer p {
 	margin: 0.4rem 0;
@@ -424,15 +477,13 @@ footer p {
 		font-size: 0.9rem;
 	}
 
-	.feature-item,
-	.editor-link {
+	.feature-item {
 		align-items: flex-start;
 		flex-direction: column;
 		gap: 0.9rem;
 	}
 
-	.feature-item .button,
-	.editor-link button {
+	.feature-item .button {
 		width: 100%;
 	}
 }

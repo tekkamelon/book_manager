@@ -5,7 +5,6 @@ const pages = [
 	{ path: '/html/index.html', label: 'トップ' },
 	{ path: '/html/list.html', label: '蔵書一覧' },
 	{ path: '/html/add.html', label: '書籍追加・データ検索' },
-	{ path: '/html/confirm.html', label: '編集' },
 	{ path: '/html/settings.html', label: '設定' },
 	{ path: '/html/google_search.html', label: '書籍追加・データ検索' },
 ];

@@ -9,64 +9,74 @@
 </head>
 
 <body>
-	<div class="container">
+	<header class="container">
 		<h1>Book Manager</h1>
 		<p class="page-intro">蔵書を検索・追加・管理します。</p>
+	</header>
 
-		<nav>
+	<main class="container">
+		<nav aria-label="メイン">
 			<a href="index.html" aria-current="page">トップ</a>
 			<a href="list.html">蔵書一覧</a>
 			<a href="add.html">書籍追加・データ検索</a>
-			<a href="confirm.html">編集</a>
 			<a href="settings.html">設定</a>
 		</nav>
 
 		<div class="card">
-			<div class="feature-list">
-				<section class="feature-item">
-					<div>
-						<h2>蔵書一覧</h2>
-						<p>登録済みの書籍を検索・確認します。</p>
-					</div>
-					<a class="button" href="list.html">開く</a>
-				</section>
+			<section aria-labelledby="primary-actions-heading">
+				<h2 id="primary-actions-heading" class="section-heading">主な操作</h2>
+				<ul class="feature-list">
+					<li class="feature-item feature-item--primary">
+						<a class="feature-link" href="list.html">
+							<h3>蔵書一覧</h3>
+							<p>登録済みの書籍を検索・確認します。</p>
+						</a>
+						<a class="button" href="list.html" aria-label="蔵書一覧を見る">一覧を見る</a>
+					</li>
 
-				<section class="feature-item">
-					<div>
-						<h2>書籍追加・データ検索</h2>
-						<p>ISBNから書籍情報を取得し、蔵書へ追加します。</p>
-					</div>
-					<a class="button" href="add.html">開く</a>
-				</section>
+					<li class="feature-item feature-item--primary">
+						<a class="feature-link" href="add.html">
+							<h3>書籍追加・データ検索</h3>
+							<p>ISBNから書籍情報を取得し、蔵書へ追加します。</p>
+						</a>
+						<a class="button" href="add.html" aria-label="書籍をISBNで追加する">ISBNで追加</a>
+					</li>
+				</ul>
+			</section>
 
-				<div class="editor-link">
-					<div>
-						<h2>編集環境</h2>
-						<p>code-serverで設定ファイルを編集します。</p>
-					</div>
-					<button id="helpButton" type="button">開く</button>
-				</div>
+			<section class="management-actions" aria-labelledby="management-actions-heading">
+				<h2 id="management-actions-heading" class="section-heading">管理</h2>
+				<ul class="feature-list feature-list--secondary">
+					<li class="feature-item">
+						<div>
+							<h3>編集環境</h3>
+							<p>code-serverでCSVファイルを編集します。</p>
+						</div>
+						<button id="helpButton" class="button button--secondary" type="button">外部で開く</button>
+					</li>
 
-				<section class="feature-item">
-					<div>
-						<h2>設定</h2>
-						<p>CSVファイルとcode-serverの接続先を設定します。</p>
-					</div>
-					<a class="button" href="settings.html">開く</a>
-				</section>
-			</div>
+					<li class="feature-item">
+						<a class="feature-link" href="settings.html">
+							<h3>設定</h3>
+							<p>CSVファイルとcode-serverの接続先を設定します。</p>
+						</a>
+						<a class="button button--secondary" href="settings.html" aria-label="設定を変更する">設定を変更</a>
+					</li>
+				</ul>
+				<p id="editorStatus" class="editor-status" role="status" hidden></p>
+			</section>
 		</div>
-
-		<script src="../js/settings.js"></script>
-		<script src="../js/index.js"></script>
-	</div>
+	</main>
 
 	<footer>
-		<h3>Links</h3>
-		<p><a href="https://github.com/tekkamelon/book_manager/tree/experimental">GitHub Repository</a></p>
-		<p>Reference: <a href="https://github.com/ShellShoccar-jpn/misc-tools">urldecode</a></p>
+		<div class="container">
+			<h2>関連リンク</h2>
+			<p><a href="https://github.com/tekkamelon/book_manager">GitHubリポジトリ</a></p>
+		</div>
 	</footer>
 
+	<script src="../js/settings.js"></script>
+	<script src="../js/index.js"></script>
 </body>
 
 </html>
