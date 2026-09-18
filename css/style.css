@@ -453,6 +453,42 @@ footer p {
 	margin: 0.4rem 0;
 }
 
+/* ISBNバーコード読取 */
+.barcode-reader-group {
+	margin-top: 0.5rem;
+}
+
+.barcode-reader {
+	background: #000;
+	border-radius: 8px;
+	overflow: hidden;
+	max-width: 100%;
+	margin-top: 0.75rem;
+}
+
+.barcode-reader video {
+	width: 100%;
+	display: block;
+}
+
+.barcode-reader__controls {
+	margin-top: 0.5rem;
+}
+
+.barcode-reader__fallback-input {
+	display: none;
+}
+
+.barcode-reader__message {
+	margin: 0.5rem 0 0;
+	font-size: 0.9rem;
+	color: var(--text-secondary);
+}
+
+.barcode-reader__message--error {
+	color: var(--accent);
+}
+
 /* モバイル向けのレスポンシブデザイン */
 @media (max-width: 600px) {
 	body {

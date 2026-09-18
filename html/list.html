@@ -25,6 +25,10 @@
 				<div class="form-group">
 					<label for="q">検索ワード</label>
 					<input type="search" id="q" name="q">
+					<div class="barcode-reader-group">
+						<button type="button" id="barcode-search-start" class="button button--secondary">バーコードを読む</button>
+						<div id="barcode-search-preview" class="barcode-reader" hidden></div>
+					</div>
 				</div>
 				<p>
 					<input type="submit" value="検索">
@@ -39,6 +43,23 @@
 
 	<script src="../js/settings.js"></script>
 	<script src="../js/list.js"></script>
+	<script src="../js/vendor/html5-qrcode.min.js"></script>
+	<script src="../js/barcode.js"></script>
+	<script>
+		mountBarcodeReader({
+			trigger: document.getElementById('barcode-search-start'),
+			preview: document.getElementById('barcode-search-preview'),
+			onSuccess: function (isbn) {
+				var input = document.getElementById('q');
+				input.value = isbn;
+				filterResult(isbn);
+				input.focus();
+			},
+			onError: function (message) {
+				console.error('barcode reader error:', message);
+			},
+		});
+	</script>
 </body>
 
 </html>

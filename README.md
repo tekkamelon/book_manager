@@ -205,9 +205,9 @@ python3 cgi_server.py
 
 #### HTMLファイル
 - **html/index.html** - メインメニュー画面
-- **html/list.html** - 蔵書一覧画面(検索機能統合済み)
+- **html/list.html** - 蔵書一覧画面(検索機能統合済み、バーコード読取対応)
 - **html/search.html** - 蔵書検索フォーム(非推奨: 蔵書一覧ページの検索機能に統合)
-- **html/add.html** - 書籍追加・データ検索フォーム
+- **html/add.html** - 書籍追加・データ検索フォーム(バーコード読取対応)
 - **html/settings.html** - 設定画面
 
 #### CGIスクリプト
@@ -218,12 +218,20 @@ python3 cgi_server.py
 
 #### その他
 - **js/settings.js** - 設定値読み込み用JavaScript
+- **js/barcode.js** - ISBNバーコード読取共通JavaScript
+- **js/vendor/** - オフライン配布用のサードパーティライブラリ(html5-qrcode 等)
 - **css/style.css** - スタイルシート(ライト/ダークモード対応)
 
 ### 機能
 - 蔵書一覧 - CSVファイルの一覧表示と絞り込み検索(クライアントサイド)
 - 書籍追加 - ISBNから書籍情報を取得しCSVに追加
+- ISBNバーコード読取 - iPhone等の背面カメラで書籍JAN(EAN-13)を読み取り、ISBN欄または検索欄へ入力する
 - 設定変更 - CSVファイルパスの設定
+
+### バーコード読取について
+- iOS Safari を想定。`getUserMedia` は HTTPS または localhost でのみ利用可能なため、実機検証時は HTTPS 終端または HTTPS トンネルを用意すること
+- 読取はユーザー操作(ボタンタップ)で開始し、1回成功すると自動的にカメラを停止する
+- 978/979 始まりの 13桁 ISBN のみ採用し、価格コード(192...等)は無視する
 
 ## 引用元
 
