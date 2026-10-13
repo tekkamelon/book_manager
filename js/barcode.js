@@ -114,7 +114,7 @@
 
 		function setRunning(state) {
 			running = state;
-			trigger.textContent = running ? '読み取りをやめる' : 'バーコードを読む';
+			trigger.textContent = running ? '読み取りをやめる' : 'カメラからバーコードを読む';
 			if (controlsEl) {
 				controlsEl.hidden = running;
 			}

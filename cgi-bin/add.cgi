@@ -176,7 +176,7 @@ cat << EOF
 	<link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-	<h1>書籍追加結果</h1>
+	<h1>書籍追加・検索結果</h1>
 
 	<nav>
 		<a href="../html/index.html">トップ</a>
